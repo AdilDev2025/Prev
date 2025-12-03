@@ -4,15 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/routers/authenticationroute.js" afterDir="false" />
+    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Table's added in prisma-client and migrations ran successfully">
+      <change afterPath="$PROJECT_DIR$/controllers/workspace_controller.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/routers/main_route.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/routers/workspace_route.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma.config.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/authenticationroute.js" beforeDir="false" afterPath="$PROJECT_DIR$/routers/authenticationroute.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -148,11 +145,36 @@
       <workItem from="1764705603761" duration="105000" />
       <workItem from="1764705724146" duration="1417000" />
       <workItem from="1764707183869" duration="72000" />
+      <workItem from="1764707258321" duration="87000" />
+      <workItem from="1764787251851" duration="1925000" />
+      <workItem from="1764797164676" duration="1851000" />
     </task>
+    <task id="LOCAL-00001" summary="jwt token-based authentication enabled for users">
+      <option name="closed" value="true" />
+      <created>1764707337199</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1764707337199</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Table's added in prisma-client and migrations ran successfully">
+      <option name="closed" value="true" />
+      <created>1764797326948</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1764797326948</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="jwt token-based authentication enabled for users" />
+    <MESSAGE value="Table's added in prisma-client and migrations ran successfully" />
+    <option name="LAST_COMMIT_MESSAGE" value="Table's added in prisma-client and migrations ran successfully" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
