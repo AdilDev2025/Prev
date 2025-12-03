@@ -1,6 +1,6 @@
 //workspace API
 const { PrismaClient } = require('@prisma/client')
-const {parse} = require("dotenv");
+
 const prisma = new PrismaClient()
 
 
