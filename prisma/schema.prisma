@@ -8,10 +8,45 @@ datasource db {
 }
 
 model users {
-  id         Int       @id @default(autoincrement())
-  name       String    @db.VarChar(255)
-  email      String    @unique(map: "email") @db.VarChar(255)
-  created_at DateTime? @default(now()) @db.Timestamp(0)
-  password   String    @db.VarChar(255)
-  role       String    @default("user") @db.VarChar(50)
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(255)
+  email           String            @unique(map: "email") @db.VarChar(255)
+  created_at      DateTime?         @default(now()) @db.Timestamp(0)
+  password        String            @db.VarChar(255)
+  role            String            @default("user") @db.VarChar(50)
+  Workspace       Workspace[]
+  WorkspaceMember WorkspaceMember[]
+}
+
+model Workspace {
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(255)
+  ownerId         Int
+  createdAt       DateTime?         @default(now()) @db.Timestamp(0)
+  updatedAt       DateTime?         @default(now()) @db.Timestamp(0)
+  users           users             @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Workspace_ibfk_1")
+  WorkspaceMember WorkspaceMember[]
+
+  @@index([createdAt], map: "idx_createdAt")
+  @@index([ownerId], map: "idx_ownerId")
+}
+
+model WorkspaceMember {
+  id          Int                  @id @default(autoincrement())
+  workspaceId Int
+  userId      Int
+  role        WorkspaceMember_role @default(user)
+  createdAt   DateTime?            @default(now()) @db.Timestamp(0)
+  Workspace   Workspace            @relation(fields: [workspaceId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "WorkspaceMember_ibfk_1")
+  users       users                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "WorkspaceMember_ibfk_2")
+
+  @@unique([workspaceId, userId], map: "unique_workspace_user")
+  @@index([role], map: "idx_role")
+  @@index([userId], map: "idx_userId")
+  @@index([workspaceId], map: "idx_workspaceId")
+}
+
+enum WorkspaceMember_role {
+  admin
+  user
 }
