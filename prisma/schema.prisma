@@ -16,6 +16,8 @@ model users {
   role            String            @default("user") @db.VarChar(50)
   Workspace       Workspace[]
   WorkspaceMember WorkspaceMember[]
+
+  Invite Invite[]
 }
 
 model Workspace {
@@ -29,6 +31,7 @@ model Workspace {
 
   @@index([createdAt], map: "idx_createdAt")
   @@index([ownerId], map: "idx_ownerId")
+  Invite Invite[]
 }
 
 model WorkspaceMember {
@@ -46,7 +49,26 @@ model WorkspaceMember {
   @@index([workspaceId], map: "idx_workspaceId")
 }
 
+model Invite {
+  id           String     @id @default(uuid())
+  email        String
+  workspaceId  Int
+  invitedBy    Int
+  status       InviteStatus @default(PENDING)
+  createdAt    DateTime   @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  inviter    users     @relation(fields: [invitedBy], references: [id])
+}
+
 enum WorkspaceMember_role {
   admin
   user
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
 }

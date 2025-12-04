@@ -6,4 +6,4 @@ const { register , login } = require('../controllers/auth.js');
 auth_router.post('/register', register);
 auth_router.post('/login', login);
 
-module.exports = { auth_router};
+module.exports = auth_router;
