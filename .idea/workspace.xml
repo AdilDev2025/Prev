@@ -4,22 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="workspace handled with CRUD operations">
-      <change afterPath="$PROJECT_DIR$/Middlewares/auth_middleware.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/workspace/workspace_Accept_controller.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/workspace/workspace_controller.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/workspace/workspace_invite_controller.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routers/workspace_routers/workspace_acceptInvite_router.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routers/workspace_routers/workspace_invite_router.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/workspace_controller.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/authenticationroute.js" beforeDir="false" afterPath="$PROJECT_DIR$/routers/authenticationroute.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/main_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/routers/main_route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/workspace_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/routers/workspace_routers/workspace_route.js" afterDir="false" />
-    </list>
+    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Workspace's operations via owner authorization" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -163,7 +148,7 @@
       <workItem from="1764852951071" duration="299000" />
       <workItem from="1764853252561" duration="3406000" />
       <workItem from="1764863290876" duration="5883000" />
-      <workItem from="1764870993225" duration="352000" />
+      <workItem from="1764870993225" duration="677000" />
     </task>
     <task id="LOCAL-00001" summary="jwt token-based authentication enabled for users">
       <option name="closed" value="true" />
@@ -197,7 +182,23 @@
       <option name="project" value="LOCAL" />
       <updated>1764799303976</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Workspace's operations via owner authorization">
+      <option name="closed" value="true" />
+      <created>1764877778858</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1764877778859</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Workspace's operations via owner authorization">
+      <option name="closed" value="true" />
+      <created>1764877794731</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1764877794731</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -207,7 +208,8 @@
     <MESSAGE value="jwt token-based authentication enabled for users" />
     <MESSAGE value="Table's added in prisma-client and migrations ran successfully" />
     <MESSAGE value="workspace handled with CRUD operations" />
-    <option name="LAST_COMMIT_MESSAGE" value="workspace handled with CRUD operations" />
+    <MESSAGE value="Workspace's operations via owner authorization" />
+    <option name="LAST_COMMIT_MESSAGE" value="Workspace's operations via owner authorization" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
