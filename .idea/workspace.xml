@@ -4,7 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Workspace's operations via owner authorization" />
+    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Workspace's operations via owner authorization">
+      <change afterPath="$PROJECT_DIR$/Middlewares/role_middleware.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/controllers/dashboard/controller_dashboard.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/routers/dashboard_routers/user_dashboard_route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/workspace/workspace_Accept_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/workspace/workspace_Accept_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/workspace/workspace_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/workspace/workspace_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/workspace/workspace_invite_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/workspace/workspace_invite_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/main_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/routers/main_route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/workspace_routers/workspace_invite_router.js" beforeDir="false" afterPath="$PROJECT_DIR$/routers/workspace_routers/workspace_invite_router.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/workspace_routers/workspace_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/routers/workspace_routers/workspace_route.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,6 +51,9 @@
     &quot;accountId&quot;: &quot;714c0ab1-ec75-47f5-93a1-e95281133b39&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -148,7 +163,8 @@
       <workItem from="1764852951071" duration="299000" />
       <workItem from="1764853252561" duration="3406000" />
       <workItem from="1764863290876" duration="5883000" />
-      <workItem from="1764870993225" duration="677000" />
+      <workItem from="1764870993225" duration="1856000" />
+      <workItem from="1765045583656" duration="3973000" />
     </task>
     <task id="LOCAL-00001" summary="jwt token-based authentication enabled for users">
       <option name="closed" value="true" />
@@ -198,7 +214,23 @@
       <option name="project" value="LOCAL" />
       <updated>1764877794731</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Workspace's operations via owner authorization">
+      <option name="closed" value="true" />
+      <created>1764878047647</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1764878047647</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Workspace's operations via owner authorization">
+      <option name="closed" value="true" />
+      <created>1764878155488</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1764878155488</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

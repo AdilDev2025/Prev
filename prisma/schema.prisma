@@ -53,6 +53,7 @@ model Invite {
   id           String     @id @default(uuid())
   email        String
   workspaceId  Int
+  role         WorkspaceMember_role @default(user)
   invitedBy    Int
   status       InviteStatus @default(PENDING)
   createdAt    DateTime   @default(now())

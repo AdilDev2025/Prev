@@ -1,32 +1,27 @@
-const prisma = require('../../lib/prisma')
-
 const send_workspace_invite = async (req, res) => {
     try {
         const workspace_id = parseInt(req.params.id);
-        const email = req.body.email;
+        const { email, role = 'user' } = req.body;  // Default role for new members
         const inviter_id = req.user.userId;
 
+        // Check if inviter is admin
         const workspace = await prisma.workspace.findUnique({
             where: { id: workspace_id }
         });
 
         if (!workspace) {
-            return res.status(404).json({ message: "workspace not found" });
+            return res.status(404).json({ message: "Workspace not found" });
         }
 
-
-        const existingMember = await prisma.workspaceMember.findFirst({
-            where: {
-                workspaceId: workspace_id,
-                users: { email: email }
-            },
-            include: { users: true }
-        });
-
-        if (existingMember) {
-            return res.status(400).json({ message: "User already in workspace" });
+        // Only workspace admin can send invites
+        if (workspace.ownerId !== inviter_id && req.user.workspaceRole !== 'admin') {
+            return res.status(403).json({ message: "Only workspace admins can send invites" });
         }
 
+        // Validate role
+        if (!['admin', 'user'].includes(role)) {
+            return res.status(400).json({ message: "Invalid role. Must be 'admin' or 'user'" });
+        }
 
         // Check if user exists
         const userToInvite = await prisma.users.findUnique({
@@ -37,7 +32,21 @@ const send_workspace_invite = async (req, res) => {
             return res.status(404).json({ message: "User with this email not found" });
         }
 
-        // Check for existing pending invite
+        // Check existing member
+        const existingMember = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId: workspace_id,
+                    userId: userToInvite.id
+                }
+            }
+        });
+
+        if (existingMember) {
+            return res.status(400).json({ message: "User is already a workspace member" });
+        }
+
+        // Check pending invite
         const existingInvite = await prisma.invite.findFirst({
             where: {
                 email: email,
@@ -54,13 +63,17 @@ const send_workspace_invite = async (req, res) => {
             data: {
                 email: email,
                 workspaceId: workspace_id,
-                invitedBy: inviter_id
+                invitedBy: inviter_id,
+                role: role  // Store intended role in invite
             }
         });
 
         return res.status(200).json({
             message: "Invite sent successfully",
-            invite
+            invite: {
+                ...invite,
+                role: role
+            }
         });
 
     } catch (error) {
