@@ -1,0 +1,17 @@
+FROM ubuntu:latest
+LABEL authors="ammarkhan"
+
+ENTRYPOINT ["top", "-b"]
+
+
+version: "3.8"
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+volumes:
+  qdrant_storage:

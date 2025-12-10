@@ -4,18 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Workspace's operations via owner authorization">
-      <change afterPath="$PROJECT_DIR$/Middlewares/role_middleware.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/controllers/dashboard/controller_dashboard.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routers/dashboard_routers/user_dashboard_route.js" afterDir="false" />
+    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Implemented role-based access control (RBAC) for workspace operations and dashboards, including invite handling, membership management, and role assignment.">
+      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/app.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/requirements.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/scripts/evaluate_accuracy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/scripts/test_recognition.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/scripts/train_model.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/src/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/src/data_augmentation.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/src/face_recognition.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/src/vector_db.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/facial-attendance/start_qdrant.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/workspace/workspace_Accept_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/workspace/workspace_Accept_controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/workspace/workspace_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/workspace/workspace_controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/workspace/workspace_invite_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/workspace/workspace_invite_controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/prisma/schema.prisma" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/main_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/routers/main_route.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/workspace_routers/workspace_invite_router.js" beforeDir="false" afterPath="$PROJECT_DIR$/routers/workspace_routers/workspace_invite_router.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/workspace_routers/workspace_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/routers/workspace_routers/workspace_route.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,6 +30,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="JavaScript File" />
+        <option value="Dockerfile" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -52,7 +58,7 @@
   }
 }</component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -67,6 +73,7 @@
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;Node.js.auth.js.executor&quot;: &quot;Run&quot;,
     &quot;Node.js.index.js.executor&quot;: &quot;Run&quot;,
+    &quot;Python.app.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
@@ -82,7 +89,7 @@
     &quot;npm.dev.executor&quot;: &quot;Run&quot;,
     &quot;npm.prisma:generate.executor&quot;: &quot;Run&quot;,
     &quot;npm.start.executor&quot;: &quot;Run&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;ts.external.directory.path&quot;: &quot;/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
@@ -96,7 +103,29 @@
       <recent name="$PROJECT_DIR$/models" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.start">
+  <component name="RunManager" selected="Python.app">
+    <configuration name="app" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="NEURO--FORCE" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/facial-attendance" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/facial-attendance/app.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -129,6 +158,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.app" />
         <item itemvalue="npm.start" />
         <item itemvalue="npm.dev" />
         <item itemvalue="npm.prisma:generate" />
@@ -165,6 +195,12 @@
       <workItem from="1764863290876" duration="5883000" />
       <workItem from="1764870993225" duration="1856000" />
       <workItem from="1765045583656" duration="3973000" />
+      <workItem from="1765049572177" duration="268000" />
+      <workItem from="1765283819789" duration="132000" />
+      <workItem from="1765283954886" duration="15863000" />
+      <workItem from="1765317003212" duration="982000" />
+      <workItem from="1765383263593" duration="3429000" />
+      <workItem from="1765386971207" duration="4401000" />
     </task>
     <task id="LOCAL-00001" summary="jwt token-based authentication enabled for users">
       <option name="closed" value="true" />
@@ -230,7 +266,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764878155488</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Implemented role-based access control (RBAC) for workspace operations and dashboards, including invite handling, membership management, and role assignment.">
+      <option name="closed" value="true" />
+      <created>1765049661387</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1765049661387</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -241,7 +285,9 @@
     <MESSAGE value="Table's added in prisma-client and migrations ran successfully" />
     <MESSAGE value="workspace handled with CRUD operations" />
     <MESSAGE value="Workspace's operations via owner authorization" />
-    <option name="LAST_COMMIT_MESSAGE" value="Workspace's operations via owner authorization" />
+    <MESSAGE value="RBAC and owner authorization with admin,user and new member " />
+    <MESSAGE value="Implemented role-based access control (RBAC) for workspace operations and dashboards, including invite handling, membership management, and role assignment." />
+    <option name="LAST_COMMIT_MESSAGE" value="" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
