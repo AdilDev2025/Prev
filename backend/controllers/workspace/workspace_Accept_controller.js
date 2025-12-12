@@ -56,9 +56,25 @@ const acceptWorkspaceInvite = async (req, res) => {
             data: { status: "ACCEPTED" }
         });
 
-        return res.json({
-            message: `You have successfully joined the workspace as ${role}`,
-            role: role
+        // Get workspace details for dashboard redirect
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: invite.workspaceId },
+            select: { id: true, name: true }
+        });
+
+        return res.status(200).json({
+            message: `Welcome to ${workspace.name}! You have successfully joined as ${role}`,
+            role: role,
+            workspace: {
+                id: workspace.id,
+                name: workspace.name
+            },
+            next_steps: [
+                "Register your face for attendance tracking",
+                "Explore workspace features and tools"
+            ],
+            dashboard_url: `/workspace-dashboard/${workspace.id}`,
+            redirect_suggested: true
         });
     } catch (error) {
         console.error("Accept invite error:", error);

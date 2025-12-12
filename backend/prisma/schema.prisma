@@ -16,8 +16,11 @@ model users {
   role            String            @default("user") @db.VarChar(50)
   Workspace       Workspace[]
   WorkspaceMember WorkspaceMember[]
-
   Invite Invite[]
+  user_id   String?  @unique // For facial recognition system
+  face_registered Boolean @default(false)
+  attendances Attendance[]
+  FaceEmbedding FaceEmbedding[]
 }
 
 model Workspace {
@@ -72,4 +75,26 @@ enum InviteStatus {
   ACCEPTED
   DECLINED
   EXPIRED
+}
+model Attendance {
+  id        String   @id @default(cuid())
+  user_id   String   // Foreign key to User.user_id
+  user      users     @relation(fields: [user_id], references: [user_id])
+
+  check_in  DateTime @default(now())
+  check_out DateTime?
+  confidence Float?  // Recognition confidence score
+  status    String   @default("present") // present/absent/late
+
+  location  String?  // Optional: room/location
+  device_id String?  // Optional: camera device
+}
+
+model FaceEmbedding {
+  id          String   @id @default(cuid())
+  user_id     String   // Foreign key to User.user_id
+  user        users     @relation(fields: [user_id], references: [user_id])
+  qdrant_id   String   @unique // Qdrant internal ID
+  created_at  DateTime @default(now())
+  is_active   Boolean  @default(true) // For multiple faces per user
 }

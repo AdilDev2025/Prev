@@ -103,7 +103,7 @@ const getUserDashboard = async (req, res) => {
     try {
         const userId = req.user.userId;
 
-        // Check if user has admin workspaces
+
         const adminWorkspaces = await prisma.workspace.findMany({
             where: {
                 OR: [
@@ -161,4 +161,123 @@ const getUserDashboard = async (req, res) => {
     }
 };
 
-module.exports = { getAdminDashboard, getEmployeeDashboard, getUserDashboard };
+// Workspace Dashboard - Shows specific workspace with components
+const getWorkspaceDashboard = async (req, res) => {
+    try {
+        const workspaceId = parseInt(req.params.workspaceId);
+        const userId = req.user.userId;
+
+        // Verify user is a member of this workspace
+        const membership = await prisma.workspaceMember.findUnique({
+            where: {
+                workspaceId_userId: {
+                    workspaceId: workspaceId,
+                    userId: userId
+                }
+            }
+        });
+
+        if (!membership) {
+            return res.status(403).json({
+                message: "You are not a member of this workspace"
+            });
+        }
+
+        // Get workspace details
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: workspaceId },
+            include: {
+                users: { // Workspace owner
+                    select: { id: true, name: true, email: true }
+                },
+                WorkspaceMember: {
+                    include: {
+                        users: {
+                            select: { id: true, name: true, email: true, face_registered: true }
+                        }
+                    }
+                }
+            }
+        });
+
+        if (!workspace) {
+            return res.status(404).json({ message: "Workspace not found" });
+        }
+
+        // Get recent attendance records for this workspace
+        const recentAttendance = await prisma.attendance.findMany({
+            where: {
+                user_id: {
+                    startsWith: `ws${workspaceId}_`
+                }
+            },
+            include: {
+                user: {
+                    select: { name: true }
+                }
+            },
+            orderBy: { check_in: 'desc' },
+            take: 10 // Last 10 attendance records
+        });
+
+        // Get user's face registration status
+        const userDetails = workspace.WorkspaceMember.find(
+            member => member.userId === userId
+        );
+
+        // Calculate workspace stats
+        const totalMembers = workspace.WorkspaceMember.length + 1; // +1 for owner
+        const registeredFaces = workspace.WorkspaceMember.filter(
+            member => member.users.face_registered
+        ).length + (workspace.users.id === userId ? 1 : 0); // Include owner if they have face registered
+
+        res.status(200).json({
+            workspace: {
+                id: workspace.id,
+                name: workspace.name,
+                owner: workspace.users,
+                user_role: membership.role,
+                created_at: workspace.createdAt
+            },
+            user: {
+                id: req.user.userId,
+                name: req.user.name,
+                email: req.user.email,
+                face_registered: userDetails ? userDetails.users.face_registered : false
+            },
+            stats: {
+                total_members: totalMembers,
+                registered_faces: registeredFaces,
+                recent_attendance_count: recentAttendance.length
+            },
+            recent_attendance: recentAttendance.map(record => ({
+                id: record.id,
+                user_name: record.user.name,
+                check_in: record.check_in,
+                confidence: record.confidence,
+                status: record.status
+            })),
+            components: {
+                attendance: {
+                    available: true,
+                    registered: userDetails ? userDetails.users.face_registered : false,
+                    recent_count: recentAttendance.length
+                }
+                // Core focus: facial attendance only
+            },
+            actions_available: [
+                userDetails && !userDetails.users.face_registered ? "register_face" : null,
+                "mark_attendance"
+            ].filter(Boolean)
+        });
+
+    } catch (error) {
+        console.error("Workspace dashboard error:", error);
+        res.status(500).json({
+            message: "Failed to load workspace dashboard",
+            error: error.message
+        });
+    }
+};
+
+module.exports = { getAdminDashboard, getEmployeeDashboard, getUserDashboard, getWorkspaceDashboard };

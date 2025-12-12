@@ -4,22 +4,51 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Implemented role-based access control (RBAC) for workspace operations and dashboards, including invite handling, membership management, and role assignment.">
-      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/app.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/scripts/evaluate_accuracy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/scripts/test_recognition.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/scripts/train_model.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/src/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/src/data_augmentation.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/src/face_recognition.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/src/vector_db.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/facial-attendance/start_qdrant.sh" afterDir="false" />
+    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Added facial recognition pipeline with Qdrant integration including Docker setup, training, and testing scripts.">
+      <change afterPath="$PROJECT_DIR$/backend/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/facial-attendance/facial_api.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/facial-attendance/src/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/routers/dashboard_routers/wm_attendance_router.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/routers/dashboard_routers/workspace_dashboard_route.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/scripts/start-services.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilotDiffState.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Middlewares/auth_middleware.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Middlewares/auth_middleware.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Middlewares/role_middleware.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Middlewares/role_middleware.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/controllers/auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/dashboard/controller_dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/controllers/dashboard/controller_dashboard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/workspace/workspace_Accept_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/controllers/workspace/workspace_Accept_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/workspace/workspace_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/controllers/workspace/workspace_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/controllers/workspace/workspace_invite_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/controllers/workspace/workspace_invite_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/.dockerignore" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/.dockerignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/scripts/evaluate_accuracy.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/scripts/evaluate_accuracy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/scripts/test_recognition.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/scripts/test_recognition.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/scripts/train_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/scripts/train_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/src/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/controllers/dashboard/attendance_WM_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/src/data_augmentation.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/src/data_augmentation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/src/face_recognition.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/src/face_recognition.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/src/vector_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/src/vector_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/facial-attendance/start_qdrant.sh" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/start_qdrant.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/prisma.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/lib/prisma.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/backend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/migrations/20251203191057_add_workspace_tables/migration.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/prisma/migrations/20251203191057_add_workspace_tables/migration.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/migrations/20251204120959_add_invite_table/migration.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/prisma/migrations/20251204120959_add_invite_table/migration.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/migrations/20251206182723_add_invite_role/migration.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/prisma/migrations/20251206182723_add_invite_role/migration.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/backend/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/authenticationroute.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/authenticationroute.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/dashboard_routers/user_dashboard_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/dashboard_routers/user_dashboard_route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/main_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/main_route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/workspace_routers/workspace_acceptInvite_router.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/workspace_routers/workspace_acceptInvite_router.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/workspace_routers/workspace_invite_router.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/workspace_routers/workspace_invite_router.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/workspace_routers/workspace_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/workspace_routers/workspace_route.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,9 +58,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JavaScript File" />
         <option value="Dockerfile" />
         <option value="Python Script" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -43,6 +72,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -58,7 +92,7 @@
   }
 }</component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
+    <option name="selectedTabId" value="DEPENDENCY_CHECKER_PROBLEMS_TAB" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -68,33 +102,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Node.js.auth.js.executor&quot;: &quot;Run&quot;,
-    &quot;Node.js.index.js.executor&quot;: &quot;Run&quot;,
-    &quot;Python.app.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/ammarkhan/WebstormProjects/NEURO--FORCE&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
-    &quot;npm.prisma:generate.executor&quot;: &quot;Run&quot;,
-    &quot;npm.start.executor&quot;: &quot;Run&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Node.js.auth.js.executor": "Run",
+    "Node.js.index.js.executor": "Run",
+    "Python.app.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "develop",
+    "javascript.nodejs.core.library.configured.version": "22.17.1",
+    "javascript.nodejs.core.library.typings.version": "22.17.2",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/Users/ammarkhan/WebstormProjects/NEURO--FORCE",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
+    "npm.prisma:generate.executor": "Run",
+    "npm.start.executor": "Run",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "to.speed.mode.migration.done": "true",
+    "ts.external.directory.path": "/Applications/WebStorm.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/controllers/Workspace" />
@@ -200,7 +236,14 @@
       <workItem from="1765283954886" duration="15863000" />
       <workItem from="1765317003212" duration="982000" />
       <workItem from="1765383263593" duration="3429000" />
-      <workItem from="1765386971207" duration="4401000" />
+      <workItem from="1765386971207" duration="8044000" />
+      <workItem from="1765398723743" duration="1123000" />
+      <workItem from="1765407813443" duration="10000" />
+      <workItem from="1765455670664" duration="1336000" />
+      <workItem from="1765457012392" duration="2747000" />
+      <workItem from="1765459769919" duration="6794000" />
+      <workItem from="1765468653614" duration="829000" />
+      <workItem from="1765518922681" duration="3405000" />
     </task>
     <task id="LOCAL-00001" summary="jwt token-based authentication enabled for users">
       <option name="closed" value="true" />
@@ -274,11 +317,30 @@
       <option name="project" value="LOCAL" />
       <updated>1765049661387</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Added facial recognition pipeline with Qdrant integration including Docker setup, training, and testing scripts.">
+      <option name="closed" value="true" />
+      <created>1765394929405</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1765394929405</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="jwt token-based authentication enabled for users" />
@@ -287,7 +349,10 @@
     <MESSAGE value="Workspace's operations via owner authorization" />
     <MESSAGE value="RBAC and owner authorization with admin,user and new member " />
     <MESSAGE value="Implemented role-based access control (RBAC) for workspace operations and dashboards, including invite handling, membership management, and role assignment." />
-    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <MESSAGE value="Added facial recognition system with Qdrant integration including Docker setup, training, and testing  scripts." />
+    <MESSAGE value="Added initial implementation of the Facial Attendance pipeline with Docker-based setup, FastAPI backend, Qdrant vector database integration, and real-time face recognition features." />
+    <MESSAGE value="Added facial recognition pipeline with Qdrant integration including Docker setup, training, and testing scripts." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added facial recognition pipeline with Qdrant integration including Docker setup, training, and testing scripts." />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

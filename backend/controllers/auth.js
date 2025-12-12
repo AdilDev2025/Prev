@@ -6,8 +6,7 @@ const JWT_SECRET = process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET
 
 const register = async (req, res) => {
     try {
-        const { email, password, name } = req.body // Added name since it's required in schema
-
+        const { email, password, name } = req.body
 
         if (!email || !password || !name) {
             return res.status(400).json({
@@ -15,7 +14,7 @@ const register = async (req, res) => {
             })
         }
 
-        // Check if user already exists - using prisma.users
+        // Check if user already exists
         const existingUser = await prisma.users.findUnique({
             where: { email }
         })
@@ -26,7 +25,7 @@ const register = async (req, res) => {
 
         const passwordHash = await bcrypt.hash(password, 10)
 
-        // Create user using prisma.users
+        // Create user
         const user = await prisma.users.create({
             data: {
                 name,
@@ -55,7 +54,7 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Email and password are required" })
         }
 
-        // Find user using prisma.users
+        // Find user
         const user = await prisma.users.findUnique({
             where: { email }
         })
@@ -64,7 +63,6 @@ const login = async (req, res) => {
             return res.status(401).json({ message: "Invalid credentials" })
         }
 
-        // Compare with user.password (not passwordHash)
         const validPass = await bcrypt.compare(password, user.password)
 
         if (!validPass) {
