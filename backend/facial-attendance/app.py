@@ -1,5 +1,4 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import cv2
 import numpy as np
@@ -85,11 +84,15 @@ async def enroll_face(user_id: str, user_name: str = None, file: UploadFile = Fi
         success = vector_db.enroll_user_faces(user_id, [image], user_name=user_name)
 
         if success:
+            # Expose the deterministic Qdrant point ID so other services
+            # (e.g. Node/Prisma) can store and later reference/delete it.
+            qdrant_id = vector_db._generate_id(user_id)
             return {
                 "status": "success",
                 "message": f"Face enrolled for user {user_name or user_id}",
                 "user_id": user_id,
-                "user_name": user_name or user_id
+                "user_name": user_name or user_id,
+                "qdrant_id": qdrant_id
             }
         else:
             raise HTTPException(status_code=400, detail="Could not enroll face - no valid faces detected")
@@ -103,6 +106,11 @@ async def enroll_face(user_id: str, user_name: str = None, file: UploadFile = Fi
 async def get_enrolled_users():
     """Get list of enrolled users"""
     try:
+        if vector_db is None:
+            raise HTTPException(
+                status_code=503,
+                detail="Vector database not available. Please ensure Qdrant is running."
+            )
         # Get all points from Qdrant to access payload data
         response = vector_db.client.scroll(
             collection_name=vector_db.collection_name,

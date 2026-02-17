@@ -1,9 +1,15 @@
 const axios = require('axios')
 const FormData = require('form-data')
 const prisma = require('../../lib/prisma')
+const crypto = require('crypto')
 
 // Facial API configuration
 const FACIAL_API_URL = process.env.FACIAL_API_URL || 'http://localhost:8000';
+
+const computeQdrantId = (user_id) => {
+    // Must match Python: hashlib.md5(f"{user_id}_face".encode()).hexdigest()
+    return crypto.createHash('md5').update(`${user_id}_face`).digest('hex');
+};
 
 const registerForAttendance = async (req, res) => {
     try {
@@ -81,10 +87,11 @@ const registerForAttendance = async (req, res) => {
             });
 
             // Create face embedding record for tracking
+            const qdrantId = enrollmentResponse.data.qdrant_id || computeQdrantId(user_id);
             const faceEmbedding = await prisma.faceEmbedding.create({
                 data: {
                     user_id: user_id,
-                    qdrant_id: `qdrant_${user_id}`,
+                    qdrant_id: qdrantId,
                     is_active: true
                 }
             });

@@ -16,17 +16,24 @@ except ImportError:
 # Optional vector_db import - only import if qdrant_client is available
 try:
     import qdrant_client
-    # Now try to import vector_db
+    VECTOR_DB_AVAILABLE = True
+    # Import vector_db after checking qdrant_client availability
     try:
         from .vector_db import vector_db
-        VECTOR_DB_AVAILABLE = True
-    except ImportError:
+        # Double-check that vector_db is actually initialized
+        if vector_db is None:
+            VECTOR_DB_AVAILABLE = False
+            print("⚠️  Vector database not initialized")
+        else:
+            print("✅ Vector database available for recognition")
+    except ImportError as e:
         VECTOR_DB_AVAILABLE = False
         vector_db = None
-except ImportError:
+        print(f"⚠️  Vector database import failed: {e}")
+except ImportError as e:
     VECTOR_DB_AVAILABLE = False
     vector_db = None
-    print("⚠️  qdrant-client not available - running in limited mode")
+    print(f"⚠️  qdrant-client not available - running in limited mode: {e}")
 
 class FacialRecognition:
     def __init__(self):
@@ -106,7 +113,7 @@ class FacialRecognition:
                 return {"recognized": False, "message": "Could not encode face"}
 
             # Use vector database for recognition (if available)
-            if self.use_vector_db and VECTOR_DB_AVAILABLE:
+            if self.use_vector_db and VECTOR_DB_AVAILABLE and vector_db is not None:
                 try:
                     matches = vector_db.find_similar_faces(face_encoding)
                     if matches:

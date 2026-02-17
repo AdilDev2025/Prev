@@ -14,11 +14,25 @@ class FaceVectorDB:
         """Create collection if it doesn't exist"""
         try:
             self.client.get_collection(self.collection_name)
-        except Exception:
-            self.client.create_collection(
-                collection_name=self.collection_name,
-                vectors_config=VectorParams(size=128, distance=Distance.COSINE)
-            )
+        except Exception as e:
+            msg = str(e).lower()
+
+            # If collection is missing, create it. Otherwise, bubble up the error
+            # (e.g. connection refused, auth issues, invalid URL).
+            if "not found" in msg or "doesn't exist" in msg or "404" in msg:
+                try:
+                    self.client.create_collection(
+                        collection_name=self.collection_name,
+                        vectors_config=VectorParams(size=128, distance=Distance.COSINE)
+                    )
+                except Exception as create_err:
+                    create_msg = str(create_err).lower()
+                    # If it was created concurrently, that's fine.
+                    if "already exists" in create_msg or "409" in create_msg or "conflict" in create_msg:
+                        return
+                    raise
+            else:
+                raise
 
     def store_face_embedding(self, user_id: str, embedding: np.ndarray, user_name: str = None, metadata: Dict = None):
         """Store face embedding in vector database"""
@@ -43,11 +57,23 @@ class FaceVectorDB:
 
     def find_similar_faces(self, embedding: np.ndarray, limit: int = 5) -> List[Dict]:
         """Find similar faces using vector similarity"""
-        results = self.client.search(
-            collection_name=self.collection_name,
-            query_vector=embedding.tolist(),
-            limit=limit
-        )
+        # qdrant-client API differs by version.
+        # Newer clients use `query_points`; older clients used `search`.
+        if hasattr(self.client, "query_points"):
+            resp = self.client.query_points(
+                collection_name=self.collection_name,
+                query=embedding.tolist(),
+                limit=limit,
+                with_payload=True,
+            )
+            results = resp.points
+        else:
+            # Fallback for older qdrant-client versions
+            results = self.client.search(
+                collection_name=self.collection_name,
+                query_vector=embedding.tolist(),
+                limit=limit
+            )
 
         matches = []
         for result in results:
@@ -113,6 +139,7 @@ class FaceVectorDB:
 # Global instance - only create if qdrant is available
 try:
     vector_db = FaceVectorDB()
+    print("✅ Vector database connected successfully")
 except Exception as e:
     print(f"⚠️  Vector database not available: {e}")
     print("   Install qdrant-client and start Qdrant server for full functionality")

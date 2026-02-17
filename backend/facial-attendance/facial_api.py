@@ -5,10 +5,9 @@ Called by Node.js server for facial operations
 """
 
 import sys
-import os
 import json
 import cv2
-import numpy as np
+import hashlib
 from pathlib import Path
 
 # Add current directory to path for imports
@@ -99,17 +98,18 @@ def enroll_face(user_id, user_name, image_path):
                 "message": "No face detected in image"
             }
 
-        # Store in vector database
         try:
             vector_db = FaceVectorDB()
             success = vector_db.enroll_user_faces(user_id, [image], user_name)
 
             if success:
+                qdrant_id = hashlib.md5(f"{user_id}_face".encode()).hexdigest()
                 return {
                     "status": "success",
                     "message": f"Face enrolled successfully for {user_name}",
                     "user_id": user_id,
                     "user_name": user_name,
+                    "qdrant_id": qdrant_id,
                     "embedding_shape": embedding.shape
                 }
             else:
