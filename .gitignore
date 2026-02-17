@@ -3,3 +3,13 @@ node_modules
 .env
 
 /generated/prisma
+
+# Python virtual environments
+.venv/
+venv/
+backend/facial-attendance/.venv/
+backend/facial-attendance/venv/
+
+# Python cache
+__pycache__/
+.pytest_cache/

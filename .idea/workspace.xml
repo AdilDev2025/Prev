@@ -4,16 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Refactored backend imports and vector database integration checks for enhanced compatibility and reliability. Updated Dockerfile requirements path and improved error handling in facial recognition modules.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/controllers/dashboard/attendance_WM_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/controllers/dashboard/attendance_WM_controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/facial-attendance/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/facial-attendance/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/facial-attendance/facial_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/facial_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/facial-attendance/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/facial-attendance/src/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/src/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/facial-attendance/src/face_recognition.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/src/face_recognition.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/facial-attendance/src/vector_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/src/vector_db.py" afterDir="false" />
+    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Refactored facial recognition pipeline to improve Qdrant integration, including enhanced error handling, deterministic ID generation, and dynamic compatibility checks. Updated Dockerfile and streamlined backend imports.">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -263,6 +255,7 @@
       <workItem from="1770754498488" duration="3001000" />
       <workItem from="1771323570417" duration="1058000" />
       <workItem from="1771324633143" duration="586000" />
+      <workItem from="1771325222692" duration="254000" />
     </task>
     <task id="LOCAL-00001" summary="jwt token-based authentication enabled for users">
       <option name="closed" value="true" />
@@ -352,7 +345,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765522847628</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Refactored facial recognition pipeline to improve Qdrant integration, including enhanced error handling, deterministic ID generation, and dynamic compatibility checks. Updated Dockerfile and streamlined backend imports.">
+      <option name="closed" value="true" />
+      <created>1771325262646</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1771325262646</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -385,7 +386,9 @@
     <MESSAGE value="Removed unused `.idea/copilotDiffState.xml` file and updated `.idea/workspace.xml` to reflect recent project changes and configurations." />
     <MESSAGE value="Removed IntelliJ-specific `.idea/copilotDiffState.xml` file and updated workspace configuration files to reflect recent project changes." />
     <MESSAGE value="Added backend documentation and updated dependencies to integrate additional features like HTTP proxying, file uploads, and enhanced API support. Removed outdated configuration files." />
-    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <MESSAGE value="Refactored backend imports and vector database integration checks for enhanced compatibility and reliability. Updated Dockerfile requirements path and improved error handling in facial recognition modules." />
+    <MESSAGE value="Refactored facial recognition pipeline to improve Qdrant integration, including enhanced error handling, deterministic ID generation, and dynamic compatibility checks. Updated Dockerfile and streamlined backend imports." />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactored facial recognition pipeline to improve Qdrant integration, including enhanced error handling, deterministic ID generation, and dynamic compatibility checks. Updated Dockerfile and streamlined backend imports." />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
