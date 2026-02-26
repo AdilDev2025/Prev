@@ -5,7 +5,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Refactored facial recognition pipeline to improve Qdrant integration, including enhanced error handling, deterministic ID generation, and dynamic compatibility checks. Updated Dockerfile and streamlined backend imports.">
+      <change afterPath="$PROJECT_DIR$/backend/src/controllers/dashboard/productivity_controller.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/routers/dashboard_routers/productivity_router.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/services/productivity_services.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/utils/scoring.utils.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/Middlewares/role_middleware.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Middlewares/role_middleware.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/backend/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/controllers/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/controllers/auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/controllers/dashboard/attendance_WM_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/controllers/dashboard/attendance_WM_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/controllers/dashboard/controller_dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/controllers/dashboard/controller_dashboard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/controllers/workspace/workspace_Accept_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/controllers/workspace/workspace_Accept_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/controllers/workspace/workspace_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/controllers/workspace/workspace_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/controllers/workspace/workspace_invite_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/controllers/workspace/workspace_invite_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/facial-attendance/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/facial-attendance/src/face_recognition.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/src/face_recognition.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/facial-attendance/src/vector_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/facial-attendance/src/vector_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/lib/prisma.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/lib/prisma.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/prisma/schema.prisma" beforeDir="false" afterPath="$PROJECT_DIR$/backend/prisma/schema.prisma" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routers/authenticationroute.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routers/authenticationroute.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routers/dashboard_routers/user_dashboard_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routers/dashboard_routers/user_dashboard_route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routers/dashboard_routers/wm_attendance_router.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routers/dashboard_routers/workspace_dashboard_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routers/dashboard_routers/workspace_dashboard_route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routers/main_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routers/main_route.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routers/workspace_routers/workspace_acceptInvite_router.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routers/workspace_routers/workspace_acceptInvite_router.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routers/workspace_routers/workspace_invite_router.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routers/workspace_routers/workspace_invite_router.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/routers/workspace_routers/workspace_route.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/routers/workspace_routers/workspace_route.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,12 +44,19 @@
       <entry key="_/Users/ammarkhan/WebstormProjects/NEURO--FORCE" value="36IEAII5VyKaxj6KawLnL0gtSBL" />
     </persistenceIdMap>
   </component>
+  <component name="CopilotUserSelectedModel">
+    <selectedModels>
+      <entry key="edit-panel" value="Claude Sonnet 4.5" />
+      <entry key="chat-panel" value="Claude Opus 4.6" />
+      <entry key="agent-panel" value="Claude Opus 4.6" />
+    </selectedModels>
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Dockerfile" />
-        <option value="JavaScript File" />
         <option value="Python Script" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -97,11 +131,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/backend/src/controllers/dashboard" />
+      <recent name="$PROJECT_DIR$/backend/src/routers/dashboard_routers" />
+      <recent name="$PROJECT_DIR$/backend/src" />
       <recent name="$PROJECT_DIR$/backend/facial-attendance" />
       <recent name="$PROJECT_DIR$/backend" />
-      <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/controllers/Workspace" />
-      <recent name="$PROJECT_DIR$/routers/workspace_routers" />
     </key>
   </component>
   <component name="RunManager" selected="npm.start">
@@ -256,6 +290,12 @@
       <workItem from="1771323570417" duration="1058000" />
       <workItem from="1771324633143" duration="586000" />
       <workItem from="1771325222692" duration="254000" />
+      <workItem from="1771325479594" duration="89000" />
+      <workItem from="1771325798345" duration="26000" />
+      <workItem from="1771930126732" duration="2389000" />
+      <workItem from="1771932808940" duration="1997000" />
+      <workItem from="1772113744094" duration="3003000" />
+      <workItem from="1772118733831" duration="3219000" />
     </task>
     <task id="LOCAL-00001" summary="jwt token-based authentication enabled for users">
       <option name="closed" value="true" />
@@ -353,7 +393,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771325262646</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Refactored facial recognition pipeline to improve Qdrant integration, including enhanced error handling, deterministic ID generation, and dynamic compatibility checks. Updated Dockerfile and streamlined backend imports.">
+      <option name="closed" value="true" />
+      <created>1771325491601</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1771325491601</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

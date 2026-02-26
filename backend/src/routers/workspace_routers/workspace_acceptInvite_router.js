@@ -1,7 +1,7 @@
 const {Router} = require('express');
 
 const {acceptWorkspaceInvite} = require('../../controllers/workspace/workspace_Accept_controller');
-const {authMiddleware} = require('../../Middlewares/auth_middleware');
+const {authMiddleware} = require('../../../Middlewares/auth_middleware');
 
 const acceptWorkspaceInvitation = Router();
 

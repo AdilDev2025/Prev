@@ -2,7 +2,11 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require("bcrypt")
 const prisma = require('../lib/prisma')
 
-const JWT_SECRET = process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET
+const getJwtSecret = () => {
+    const secret = process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET;
+    if (!secret) throw new Error('JWT secret not configured');
+    return secret;
+};
 
 const register = async (req, res) => {
     try {
@@ -70,8 +74,8 @@ const login = async (req, res) => {
         }
 
         const token = jwt.sign(
-            { userId: user.id, email: user.email, role: user.role },
-            JWT_SECRET,
+            { userId: user.id, name: user.name, email: user.email, role: user.role },
+            getJwtSecret(),
             { expiresIn: '24h' }
         )
 

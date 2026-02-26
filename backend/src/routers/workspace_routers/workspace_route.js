@@ -9,8 +9,8 @@ const {
 } = require('../../controllers/workspace/workspace_controller.js');
 
 
-const { authMiddleware } = require('../../Middlewares/auth_middleware');
-const { checkWorkspaceRole } = require('../../Middlewares/role_middleware');
+const { authMiddleware } = require('../../../Middlewares/auth_middleware');
+const { checkWorkspaceRole } = require('../../../Middlewares/role_middleware');
 
 const workspace_controller_router = Router();
 

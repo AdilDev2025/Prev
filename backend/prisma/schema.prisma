@@ -14,13 +14,15 @@ model users {
   created_at      DateTime?         @default(now()) @db.Timestamp(0)
   password        String            @db.VarChar(255)
   role            String            @default("user") @db.VarChar(50)
-  Workspace       Workspace[]
+  ownedWorkspaces Workspace[]       @relation("WorkspaceOwner")
   WorkspaceMember WorkspaceMember[]
   Invite Invite[]
-  user_id   String?  @unique // For facial recognition system
+  user_id   String?  @unique // Optional external biometric ID (facial recognition)
   face_registered Boolean @default(false)
   attendances Attendance[]
   FaceEmbedding FaceEmbedding[]
+
+  ProductivitySnapshot ProductivitySnapshot[]
 }
 
 model Workspace {
@@ -29,12 +31,14 @@ model Workspace {
   ownerId         Int
   createdAt       DateTime?         @default(now()) @db.Timestamp(0)
   updatedAt       DateTime?         @default(now()) @db.Timestamp(0)
-  users           users             @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Workspace_ibfk_1")
+  owner           users             @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Workspace_ibfk_1")
   WorkspaceMember WorkspaceMember[]
+  Invite          Invite[]
+  ProductivitySnapshots ProductivitySnapshot[]
 
   @@index([createdAt], map: "idx_createdAt")
   @@index([ownerId], map: "idx_ownerId")
-  Invite Invite[]
+  Attendance Attendance[]
 }
 
 model WorkspaceMember {
@@ -76,25 +80,71 @@ enum InviteStatus {
   DECLINED
   EXPIRED
 }
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+}
+
 model Attendance {
-  id        String   @id @default(cuid())
-  user_id   String   // Foreign key to User.user_id
-  user      users     @relation(fields: [user_id], references: [user_id])
+  id        String           @id @default(cuid())
 
-  check_in  DateTime @default(now())
-  check_out DateTime?
-  confidence Float?  // Recognition confidence score
-  status    String   @default("present") // present/absent/late
+  // Standardized relation to users.id
+  userId    Int
+  user      users            @relation(fields: [userId], references: [id])
 
-  location  String?  // Optional: room/location
-  device_id String?  // Optional: camera device
+  // Attendance is always scoped to a workspace
+  workspaceId Int
+  workspace   Workspace       @relation(fields: [workspaceId], references: [id])
+
+  check_in   DateTime        @default(now())
+  check_out  DateTime?
+  confidence Float?          // Recognition confidence score
+  status     AttendanceStatus @default(PRESENT)
+
+  // Productivity-related fields
+  sessionDuration Float?
+  isAfterHours    Boolean     @default(false)
+  embeddingDrift  Float?
+
+  location   String?         // Optional: room/location
+  device_id  String?         // Optional: camera device
 }
 
 model FaceEmbedding {
   id          String   @id @default(cuid())
-  user_id     String   // Foreign key to User.user_id
-  user        users     @relation(fields: [user_id], references: [user_id])
+  // Standardized relation to users.id
+  userId      Int
+  user        users    @relation(fields: [userId], references: [id])
   qdrant_id   String   @unique // Qdrant internal ID
   created_at  DateTime @default(now())
   is_active   Boolean  @default(true) // For multiple faces per user
+}
+
+model ProductivitySnapshot {
+  id                String   @id @default(uuid())
+  userId            Int
+  workspaceId       Int
+
+  attendanceScore   Float
+  reliabilityScore  Float
+  totalHours        Float
+  avgConfidence     Float
+  afterHours        Float
+
+  finalScore        Float
+
+  periodType        String   // "daily" | "monthly"
+  periodStart       DateTime
+  periodEnd         DateTime
+
+  generatedAt       DateTime @default(now())
+
+  user        users      @relation(fields: [userId], references: [id])
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([periodType])
 }

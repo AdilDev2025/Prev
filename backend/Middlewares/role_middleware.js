@@ -1,4 +1,4 @@
-const prisma = require('../lib/prisma');
+const prisma = require('../src/lib/prisma');
 
 const checkWorkspaceRole = (requiredRole) => {
     return async (req, res, next) => {

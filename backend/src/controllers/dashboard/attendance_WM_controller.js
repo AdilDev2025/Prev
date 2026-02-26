@@ -3,12 +3,14 @@ const FormData = require('form-data')
 const prisma = require('../../lib/prisma')
 const crypto = require('crypto')
 
-// Facial API configuration
-const FACIAL_API_URL = process.env.FACIAL_API_URL || 'http://localhost:8000';
+// Facial API configuration - read at call time to ensure dotenv has loaded
+const getFacialApiUrl = () => process.env.FACIAL_API_URL || 'http://localhost:8000';
 
 const computeQdrantId = (user_id) => {
-    // Must match Python: hashlib.md5(f"{user_id}_face".encode()).hexdigest()
-    return crypto.createHash('md5').update(`${user_id}_face`).digest('hex');
+    // Must match Python: str(uuid.UUID(hashlib.md5(f"{user_id}_face".encode()).hexdigest()))
+    const hex = crypto.createHash('md5').update(`${user_id}_face`).digest('hex');
+    // Format as UUID: 8-4-4-4-12
+    return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
 };
 
 const registerForAttendance = async (req, res) => {
@@ -38,18 +40,30 @@ const registerForAttendance = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Verify workspace membership
-        const workspaceMember = await prisma.workspaceMember.findUnique({
-            where: {
-                workspaceId_userId: {
-                    workspaceId: workspaceId,
-                    userId: userId
-                }
-            }
+        // Verify workspace membership or ownership
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: workspaceId }
         });
 
-        if (!workspaceMember) {
-            return res.status(403).json({ message: "Not a member of this workspace" });
+        if (!workspace) {
+            return res.status(404).json({ message: "Workspace not found" });
+        }
+
+        const isOwner = workspace.ownerId === userId;
+
+        if (!isOwner) {
+            const workspaceMember = await prisma.workspaceMember.findUnique({
+                where: {
+                    workspaceId_userId: {
+                        workspaceId: workspaceId,
+                        userId: userId
+                    }
+                }
+            });
+
+            if (!workspaceMember) {
+                return res.status(403).json({ message: "Not a member of this workspace" });
+            }
         }
 
         // Check if face already registered
@@ -70,7 +84,7 @@ const registerForAttendance = async (req, res) => {
         // Call Python facial recognition API
         const enrollmentResponse = await axios({
             method: 'POST',
-            url: `${FACIAL_API_URL}/enroll-face?user_id=${user_id}&user_name=${encodeURIComponent(user.name)}`,
+            url: `${getFacialApiUrl()}/enroll-face?user_id=${user_id}&user_name=${encodeURIComponent(user.name)}`,
             data: formData,
             headers: formData.getHeaders()
         });
@@ -90,7 +104,7 @@ const registerForAttendance = async (req, res) => {
             const qdrantId = enrollmentResponse.data.qdrant_id || computeQdrantId(user_id);
             const faceEmbedding = await prisma.faceEmbedding.create({
                 data: {
-                    user_id: user_id,
+                    userId: userId,
                     qdrant_id: qdrantId,
                     is_active: true
                 }
@@ -131,18 +145,30 @@ const attendance_WM = async (req, res) => {
             return res.status(401).json({ message: "Authentication required" });
         }
 
-        // Verify workspace membership (user must be member to mark attendance)
-        const checkMemberOfWorkspace = await prisma.workspaceMember.findUnique({
-            where: {
-                workspaceId_userId: {
-                    workspaceId: workspaceId,
-                    userId: userId
-                }
-            }
+        // Verify workspace membership or ownership
+        const workspaceRecord = await prisma.workspace.findUnique({
+            where: { id: workspaceId }
         });
 
-        if (!checkMemberOfWorkspace) {
-            return res.status(403).json({ message: "Not a member of this workspace" });
+        if (!workspaceRecord) {
+            return res.status(404).json({ message: "Workspace not found" });
+        }
+
+        const isOwnerForAttendance = workspaceRecord.ownerId === userId;
+
+        if (!isOwnerForAttendance) {
+            const checkMemberOfWorkspace = await prisma.workspaceMember.findUnique({
+                where: {
+                    workspaceId_userId: {
+                        workspaceId: workspaceId,
+                        userId: userId
+                    }
+                }
+            });
+
+            if (!checkMemberOfWorkspace) {
+                return res.status(403).json({ message: "Not a member of this workspace" });
+            }
         }
 
         // File validation
@@ -162,7 +188,7 @@ const attendance_WM = async (req, res) => {
         // Call Python facial recognition API for recognition
         const recognitionResponse = await axios({
             method: 'POST',
-            url: `${FACIAL_API_URL}/attendance-recognition`,
+            url: `${getFacialApiUrl()}/attendance-recognition`,
             data: formData,
             headers: formData.getHeaders()
         });
@@ -207,10 +233,11 @@ const attendance_WM = async (req, res) => {
             // Log attendance in database
             const attendance = await prisma.attendance.create({
                 data: {
-                    user_id: recognized_user_id,
+                    userId: recognizedUserId,
+                    workspaceId: workspaceId,
                     confidence: recognitionResult.confidence,
                     location: `Workspace ${workspaceId}`,
-                    status: "present"
+                    status: "PRESENT"
                 }
             });
 

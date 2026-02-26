@@ -4,7 +4,7 @@ const workspace_invite_router = require('./workspace_routers/workspace_invite_ro
 const acceptWorkspaceInvitation = require('./workspace_routers/workspace_acceptInvite_router');
 const user_dashboard = require('./dashboard_routers/user_dashboard_route');
 const workspace_dashboard = require('./dashboard_routers/workspace_dashboard_route');
-
+const productivity_router = require('./dashboard_routers/productivity_router')
 const router = require('express').Router();
 
 // Authentication routes
@@ -18,6 +18,8 @@ router.use('/workspace', workspace_controller_router);
 
 // Workspace dashboard (for workspace members)
 router.use('/workspace-dashboard', workspace_dashboard);
+
+router.use('/productivity', productivity_router);
 
 // Invitation routes
 router.use(workspace_invite_router);

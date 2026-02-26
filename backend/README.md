@@ -1,220 +1,250 @@
-# NEURO-FORCE Backend API
+# ⚡ NEURO-FORCE
 
-A Node.js backend API with JWT authentication, Prisma ORM, and integrated Facial Recognition system.
+Workforce management platform with facial recognition attendance, workspace collaboration, and AI-driven productivity scoring.
 
-## 🏗️ Architecture
+## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    NEURO-FORCE                          │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  ┌─────────────────┐       ┌─────────────────────────┐  │
-│  │   Node.js API   │       │   Python FastAPI        │  │
-│  │   Port: 3000    │──────▶│   Port: 8000            │  │
-│  │                 │ proxy │   (Facial Recognition)  │  │
-│  └─────────────────┘       └─────────────────────────┘  │
-│         │                            │                  │
-│         │                            │                  │
-│         ▼                            ▼                  │
-│  ┌─────────────────┐       ┌─────────────────────────┐  │
-│  │     MySQL       │       │       Qdrant            │  │
-│  │   (Prisma ORM)  │       │   (Vector Database)    │  │
-│  └─────────────────┘       └─────────────────────────┘  │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+NEURO-FORCE/
+├── backend/                        # Node.js Express API (port 3000)
+│   ├── index.js                    # Entry point + proxy config
+│   ├── Middlewares/
+│   │   ├── auth_middleware.js      # JWT verification
+│   │   └── role_middleware.js      # RBAC (admin/user)
+│   ├── src/
+│   │   ├── controllers/
+│   │   │   ├── auth.js             # Register + Login
+│   │   │   ├── dashboard/
+│   │   │   │   ├── controller_dashboard.js      # User & workspace dashboards
+│   │   │   │   ├── attendance_WM_controller.js  # Face registration & attendance
+│   │   │   │   └── productivity_controller.js   # Productivity snapshots
+│   │   │   └── workspace/
+│   │   │       ├── workspace_controller.js      # CRUD + member management
+│   │   │       ├── workspace_invite_controller.js
+│   │   │       └── workspace_Accept_controller.js
+│   │   ├── routers/
+│   │   │   ├── main_route.js       # Route aggregator
+│   │   │   ├── authenticationroute.js
+│   │   │   ├── dashboard_routers/
+│   │   │   └── workspace_routers/
+│   │   ├── services/
+│   │   │   └── productivity_services.js  # Scoring engine
+│   │   ├── utils/
+│   │   │   └── scoring.utils.js    # Attendance/reliability/final score
+│   │   └── lib/
+│   │       └── prisma.js           # Prisma client singleton
+│   ├── prisma/
+│   │   └── schema.prisma           # MySQL schema (Users, Workspaces, Attendance, etc.)
+│   ├── facial-attendance/          # Python FastAPI service (port 8000)
+│   │   ├── app.py                  # FastAPI endpoints
+│   │   ├── requirements.txt        # Python dependencies
+│   │   ├── src/
+│   │   │   ├── face_recognition.py # DLIB face embedding extraction
+│   │   │   ├── vector_db.py        # Qdrant vector storage
+│   │   │   └── data_augmentation.py
+│   │   └── scripts/                # Training & evaluation scripts
+│   └── api-tester.html             # Interactive API testing UI
+└── frontend/
+    └── index.html
 ```
 
-## 🚀 Quick Start
+### Service Communication
+
+```
+┌──────────────────┐       ┌───────────────────────┐
+│  Node.js API     │       │  Python FastAPI        │
+│  Port: 3000      │──────▶│  Port: 8000            │
+│  (Express)       │ proxy │  (Facial Recognition)  │
+└────────┬─────────┘       └──────────┬────────────┘
+         │                            │
+         ▼                            ▼
+┌──────────────────┐       ┌───────────────────────┐
+│  MySQL           │       │  Qdrant                │
+│  (Prisma ORM)    │       │  (Vector Database)     │
+└──────────────────┘       └───────────────────────┘
+```
+
+## Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- Python 3.9+
-- MySQL database
-- Qdrant (for facial recognition vectors)
 
-### Installation
+- **Node.js** 18+
+- **Python** 3.9+
+- **MySQL** running locally
+- **Qdrant** (for facial recognition vectors)
+
+### 1. Setup Backend
 
 ```bash
-# Install Node.js dependencies
+cd backend
+
+# Install dependencies
 npm install
 
-# Generate Prisma client
-npm run prisma:generate
+# Create .env file (copy and edit as needed)
+cat .env
+# DATABASE_URL="mysql://root:1234@localhost:3306/neurodb"
+# JWT_SECRET="your-secret-key"
+# PORT=3000
+# FACIAL_API_URL=http://localhost:8000
 
-# Run database migrations
-npm run prisma:migrate
-```
+# Generate Prisma client & run migrations
+npx prisma generate
+npx prisma migrate dev
 
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-# Database
-DATABASE_URL="mysql://user:password@localhost:3306/neurodb"
-
-# JWT
-JWT_SECRET=your-secret-key
-
-# Server Ports
-PORT=3000
-FACIAL_API_PORT=8000
-FACIAL_API_URL=http://localhost:8000
-```
-
-### Starting Services
-
-**Start Node.js backend only:**
-```bash
-npm start
-# or for development with hot reload
+# Start server
 npm run dev
 ```
 
-**Start all services (Node.js + Python Facial API):**
+### 2. Setup Facial Recognition (Optional)
+
 ```bash
-npm run start:all
+cd backend/facial-attendance
+
+# Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start Qdrant
+./start_qdrant.sh
+
+# Start FastAPI
+python app.py
 ```
 
-## 📡 API Endpoints
+### 3. Start Everything
 
-### Health Check
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/health` | Server status and service info |
+```bash
+cd backend
+npm run start:all    # Starts both Node.js + Python services
+```
+
+## API Endpoints
+
+### Health
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/health` | ✗ | Server status |
 
 ### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Register new user |
-| POST | `/api/auth/login` | User login |
-
-### User Dashboard
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| GET | `/api/dashboard` | ✓ | Get user dashboard |
+| `POST` | `/api/auth/register` | ✗ | Register user (`name`, `email`, `password`) |
+| `POST` | `/api/auth/login` | ✗ | Login → returns JWT token |
 
-### Workspace Management
+### Dashboard
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/dashboard` | ✓ | User dashboard (auto-detects admin/employee) |
+| `GET` | `/api/workspace-dashboard/:workspaceId` | ✓ | Workspace dashboard with attendance stats |
+
+### Workspaces
 | Method | Endpoint | Auth | Role | Description |
 |--------|----------|------|------|-------------|
-| GET | `/api/workspace` | ✓ | - | List workspaces |
-| POST | `/api/workspace` | ✓ | - | Create workspace |
-| PATCH | `/api/workspace/:id` | ✓ | admin | Update workspace |
-| DELETE | `/api/workspace/:id` | ✓ | admin | Delete workspace |
-| GET | `/api/workspace/:id/members` | ✓ | admin | List members |
-| PATCH | `/api/workspace/:id/members` | ✓ | admin | Update member role |
-
-### Workspace Dashboard
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | `/api/workspace-dashboard/:workspaceId` | ✓ | Get workspace dashboard |
-| POST | `/api/workspace-dashboard/:workspaceId/attendance/register-face` | ✓ | Register face for attendance |
-| POST | `/api/workspace-dashboard/:workspaceId/attendance/mark-attendance` | ✓ | Mark attendance via face recognition |
+| `GET` | `/api/workspace` | ✓ | any | List owned workspaces |
+| `POST` | `/api/workspace` | ✓ | any | Create workspace |
+| `PATCH` | `/api/workspace/:id` | ✓ | admin | Update workspace |
+| `DELETE` | `/api/workspace/:id` | ✓ | admin | Delete workspace |
+| `GET` | `/api/workspace/:id/members` | ✓ | admin | List members |
+| `PATCH` | `/api/workspace/:id/members` | ✓ | admin | Update member role |
 
 ### Invitations
 | Method | Endpoint | Auth | Role | Description |
 |--------|----------|------|------|-------------|
-| POST | `/api/workspace/:id/invite` | ✓ | admin | Send workspace invite |
-| POST | `/api/workspace/invite/:inviteId/accept` | ✓ | - | Accept invitation |
+| `POST` | `/api/workspace/:id/invite` | ✓ | admin | Send invite (`email`, `role`) |
+| `POST` | `/api/workspace/invite/:inviteId/accept` | ✓ | any | Accept invite |
 
-### Facial Recognition (Proxied to Python API)
+### Attendance (Facial Recognition)
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `POST` | `/api/workspace-dashboard/:id/attendance/register-face` | ✓ | Register face (multipart: `face` image) |
+| `POST` | `/api/workspace-dashboard/:id/attendance/mark-attendance` | ✓ | Mark attendance (multipart: `face` image) |
+
+### Productivity
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `POST` | `/api/productivity/snapshot` | ✗ | Generate snapshot (`userId`, `workspaceId`, `startDate`, `endDate`) |
+| `GET` | `/api/productivity/snapshots/:userId/:workspaceId` | ✗ | Get snapshot history |
+| `GET` | `/api/productivity/snapshot/latest/:userId/:workspaceId` | ✗ | Get latest snapshot |
+| `POST` | `/api/productivity/workspace/:workspaceId/generate-all` | ✗ | Generate for all members |
+
+### Facial API (Proxied → Python)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/facial/` | Facial API status |
-| GET | `/api/facial/health` | Facial API health check |
-| POST | `/api/facial/enroll-face` | Enroll a face |
-| POST | `/api/facial/attendance-recognition` | Recognize face |
+| `GET` | `/api/facial/health` | Facial service health |
+| `GET` | `/api/facial/enrolled-users` | List enrolled faces |
+| `POST` | `/api/facial/enroll-face` | Enroll face directly |
+| `POST` | `/api/facial/attendance-recognition` | Recognize face directly |
 
-## 📁 Project Structure
+## Authentication
 
-```
-NEURO-FORCE/
-├── index.js                 # Main entry point
-├── package.json             # Node.js dependencies
-├── .env                     # Environment variables
-├── controllers/
-│   ├── auth.js              # Authentication logic
-│   ├── dashboard/
-│   │   ├── controller_dashboard.js
-│   │   └── attendance_WM_controller.js
-│   └── workspace/
-│       ├── workspace_controller.js
-│       ├── workspace_invite_controller.js
-│       └── workspace_Accept_controller.js
-├── routers/
-│   ├── main_route.js        # Main router
-│   ├── authenticationroute.js
-│   ├── dashboard_routers/
-│   └── workspace_routers/
-├── Middlewares/
-│   ├── auth_middleware.js   # JWT verification
-│   └── role_middleware.js   # RBAC middleware
-├── prisma/
-│   └── schema.prisma        # Database schema
-├── lib/
-│   └── prisma.js            # Prisma client
-├── facial-attendance/       # Python facial recognition
-│   ├── app.py               # FastAPI application
-│   ├── facial_api.py        # CLI for facial ops
-│   ├── requirements.txt
-│   └── src/
-│       ├── face_recognition.py
-│       └── vector_db.py
-└── scripts/
-    └── start-services.sh    # Start all services
-```
-
-## 🔒 Authentication
-
-All protected routes require a JWT token in the Authorization header:
+All protected routes require a JWT token:
 
 ```
-Authorization: Bearer <your_token>
+Authorization: Bearer <token>
 ```
 
-### Getting a Token
-
-1. Register a user:
+**Get a token:**
 ```bash
+# Register
 curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"name": "John Doe", "email": "john@example.com", "password": "password123"}'
-```
+  -d '{"name":"John","email":"john@test.com","password":"pass123"}'
 
-2. Login to get token:
-```bash
+# Login
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "john@example.com", "password": "password123"}'
-```
+  -d '{"email":"john@test.com","password":"pass123"}'
 
-3. Use the token:
-```bash
+# Use token
 curl http://localhost:3000/api/dashboard \
-  -H "Authorization: Bearer <your_token>"
+  -H "Authorization: Bearer <token>"
 ```
 
-## 🔧 Development
+## Productivity Scoring
 
-### Running in Development Mode
+Scores are calculated from facial attendance data:
+
+| Score | Weight | Formula |
+|-------|--------|---------|
+| **Attendance** (0-1) | 70% | `(avgConfidence × 0.6) + (hoursWorked/160 × 0.4)` |
+| **Reliability** (0-1) | 30% | `avgConfidence - consistencyPenalty - anomalyPenalty - driftPenalty` |
+| **Final** (0-100) | — | `(attendance × 0.7 + reliability × 0.3 + afterHoursBonus) × 100` |
+
+## API Testing UI
+
+Open `backend/api-tester.html` in a browser for an interactive endpoint testing interface with:
+- Auto-saved JWT tokens
+- File upload support for face endpoints
+- Syntax-highlighted JSON responses
+- All 22 endpoints pre-configured
+
+## Database Schema
+
+Key models: `users`, `Workspace`, `WorkspaceMember`, `Invite`, `Attendance`, `FaceEmbedding`, `ProductivitySnapshot`
+
 ```bash
-npm run dev
+# View schema
+cat backend/prisma/schema.prisma
+
+# Open visual editor
+cd backend && npx prisma studio
 ```
 
-### Database Commands
+## Development
+
 ```bash
-# Generate Prisma client
-npm run prisma:generate
+cd backend
 
-# Run migrations
-npm run prisma:migrate
-
-# Open Prisma Studio
-npx prisma studio
+npm run dev              # Start with hot reload
+npm run prisma:generate  # Regenerate Prisma client
+npm run prisma:migrate   # Run migrations
+npx prisma studio        # Visual DB browser
 ```
 
-## 📄 License
+## License
 
-ISC License - Ammar Khan
-
+ISC — Ammar Khan

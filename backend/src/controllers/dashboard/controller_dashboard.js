@@ -20,7 +20,11 @@ const getAdminDashboard = async (req, res) => {
             },
             include: {
                 WorkspaceMember: {
-                    include: { users: true }
+                    include: {
+                        users: {
+                            select: { id: true, name: true, email: true, face_registered: true }
+                        }
+                    }
                 },
                 Invite: true
             }
@@ -70,7 +74,7 @@ const getEmployeeDashboard = async (req, res) => {
                 ]
             },
             include: {
-                users: {  // Owner info
+                owner: {  // Owner info
                     select: {
                         id: true,
                         name: true,
@@ -167,27 +171,43 @@ const getWorkspaceDashboard = async (req, res) => {
         const workspaceId = parseInt(req.params.workspaceId);
         const userId = req.user.userId;
 
-        // Verify user is a member of this workspace
-        const membership = await prisma.workspaceMember.findUnique({
-            where: {
-                workspaceId_userId: {
-                    workspaceId: workspaceId,
-                    userId: userId
-                }
-            }
+        // Check if user is workspace owner
+        const workspace = await prisma.workspace.findUnique({
+            where: { id: workspaceId }
         });
 
-        if (!membership) {
-            return res.status(403).json({
-                message: "You are not a member of this workspace"
-            });
+        if (!workspace) {
+            return res.status(404).json({ message: "Workspace not found" });
         }
 
-        // Get workspace details
-        const workspace = await prisma.workspace.findUnique({
+        const isOwner = workspace.ownerId === userId;
+
+        // Verify user is a member of this workspace (or owner)
+        let membership = null;
+        if (!isOwner) {
+            membership = await prisma.workspaceMember.findUnique({
+                where: {
+                    workspaceId_userId: {
+                        workspaceId: workspaceId,
+                        userId: userId
+                    }
+                }
+            });
+
+            if (!membership) {
+                return res.status(403).json({
+                    message: "You are not a member of this workspace"
+                });
+            }
+        }
+
+        const userRole = isOwner ? 'admin' : (membership && membership.role) || 'user';
+
+        // Get workspace details with relations
+        const workspaceDetails = await prisma.workspace.findUnique({
             where: { id: workspaceId },
             include: {
-                users: { // Workspace owner
+                owner: { // Workspace owner
                     select: { id: true, name: true, email: true }
                 },
                 WorkspaceMember: {
@@ -200,16 +220,14 @@ const getWorkspaceDashboard = async (req, res) => {
             }
         });
 
-        if (!workspace) {
+        if (!workspaceDetails) {
             return res.status(404).json({ message: "Workspace not found" });
         }
 
         // Get recent attendance records for this workspace
         const recentAttendance = await prisma.attendance.findMany({
             where: {
-                user_id: {
-                    startsWith: `ws${workspaceId}_`
-                }
+                workspaceId: workspaceId
             },
             include: {
                 user: {
@@ -221,23 +239,23 @@ const getWorkspaceDashboard = async (req, res) => {
         });
 
         // Get user's face registration status
-        const userDetails = workspace.WorkspaceMember.find(
+        const userDetails = workspaceDetails.WorkspaceMember.find(
             member => member.userId === userId
         );
 
         // Calculate workspace stats
-        const totalMembers = workspace.WorkspaceMember.length + 1; // +1 for owner
-        const registeredFaces = workspace.WorkspaceMember.filter(
+        const totalMembers = workspaceDetails.WorkspaceMember.length + 1; // +1 for owner
+        const registeredFaces = workspaceDetails.WorkspaceMember.filter(
             member => member.users.face_registered
-        ).length + (workspace.users.id === userId ? 1 : 0); // Include owner if they have face registered
+        ).length;
 
         res.status(200).json({
             workspace: {
-                id: workspace.id,
-                name: workspace.name,
-                owner: workspace.users,
-                user_role: membership.role,
-                created_at: workspace.createdAt
+                id: workspaceDetails.id,
+                name: workspaceDetails.name,
+                owner: workspaceDetails.owner,
+                user_role: userRole,
+                created_at: workspaceDetails.createdAt
             },
             user: {
                 id: req.user.userId,

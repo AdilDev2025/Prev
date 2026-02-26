@@ -1,8 +1,10 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 import numpy as np
-import json
-from typing import List, Dict, Optional
+import hashlib
+import uuid
+from datetime import datetime, timezone
+from typing import List, Dict
 
 class FaceVectorDB:
     def __init__(self, url: str = "http://localhost:6333"):
@@ -38,9 +40,9 @@ class FaceVectorDB:
         """Store face embedding in vector database"""
         payload = {
             "user_id": user_id,
-            "user_name": user_name or user_id,  # Use user_name if provided, otherwise user_id
+            "user_name": user_name or user_id,
             "embedding_type": "face",
-            "created_at": "2024-12-04T10:00:00Z",
+            "created_at": datetime.now(timezone.utc).isoformat(),
             **(metadata or {})
         }
 
@@ -89,9 +91,9 @@ class FaceVectorDB:
         return matches
 
     def _generate_id(self, user_id: str) -> str:
-        """Generate unique ID for face embedding"""
-        import hashlib
-        return hashlib.md5(f"{user_id}_face".encode()).hexdigest()
+        """Generate a deterministic UUID for a user's face embedding"""
+        hex_digest = hashlib.md5(f"{user_id}_face".encode()).hexdigest()
+        return str(uuid.UUID(hex_digest))
 
     def enroll_user_faces(self, user_id: str, face_images: List[np.ndarray], user_name: str = None):
         """Enroll user with multiple face images"""
@@ -110,7 +112,7 @@ class FaceVectorDB:
             # Average multiple embeddings for better representation
             avg_embedding = np.mean(embeddings, axis=0)
             self.store_face_embedding(user_id, avg_embedding, user_name=user_name or user_id, metadata={
-                "enrollment_date": "2024-12-04",
+                "enrollment_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
                 "num_samples": len(embeddings)
             })
             return True

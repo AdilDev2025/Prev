@@ -1,7 +1,7 @@
 const express = require('express');
 const user_dashboard = express.Router();
 const {getUserDashboard} = require('../../controllers/dashboard/controller_dashboard')
-const {authMiddleware} = require('../../Middlewares/auth_middleware');
+const {authMiddleware} = require('../../../Middlewares/auth_middleware');
 
 user_dashboard.use(authMiddleware);
 

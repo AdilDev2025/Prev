@@ -161,14 +161,18 @@ const getWorkspaceMembers = async (req, res) => {
         // Add owner as admin
         const workspace = await prisma.workspace.findUnique({
             where: { id: workspaceId },
-            include: { users: true }
+            include: { owner: true }
         });
+
+        if (!workspace) {
+            return res.status(404).json({ message: "Workspace not found" });
+        }
 
         const allMembers = [
             {
-                userId: workspace.users.id,
-                name: workspace.users.name,
-                email: workspace.users.email,
+                userId: workspace.owner.id,
+                name: workspace.owner.name,
+                email: workspace.owner.email,
                 role: 'admin',
                 isOwner: true
             },
@@ -193,10 +197,22 @@ const updateMemberRole = async (req, res) => {
         const { userId, role } = req.body;
         const currentUserId = req.user.userId;
 
+        if (!userId || !role) {
+            return res.status(400).json({ message: "userId and role are required" });
+        }
+
+        if (!['admin', 'user'].includes(role)) {
+            return res.status(400).json({ message: "Invalid role. Must be 'admin' or 'user'" });
+        }
+
         // Verify current user is admin
         const workspace = await prisma.workspace.findUnique({
             where: { id: workspaceId }
         });
+
+        if (!workspace) {
+            return res.status(404).json({ message: "Workspace not found" });
+        }
 
         if (workspace.ownerId !== currentUserId && req.user.workspaceRole !== 'admin') {
             return res.status(403).json({ message: "Admin access required" });

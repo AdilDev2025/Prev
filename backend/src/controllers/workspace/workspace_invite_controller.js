@@ -1,3 +1,5 @@
+const prisma = require('../../lib/prisma');
+
 const send_workspace_invite = async (req, res) => {
     try {
         const workspace_id = parseInt(req.params.id);
@@ -77,8 +79,8 @@ const send_workspace_invite = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Server error", error });
+        console.error("Send invite error:", error);
+        return res.status(500).json({ message: "Server error", error: error.message });
     }
 };
 

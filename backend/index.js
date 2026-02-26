@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const FACIAL_API_URL = process.env.FACIAL_API_URL || 'http://localhost:8000';
 
-const { router } = require('./routers/main_route');
+const { router } = require('./src/routers/main_route');
 
 // CORS configuration
 app.use(cors({

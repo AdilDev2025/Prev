@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 import cv2
 import numpy as np
 from src.face_recognition import recognition_engine
@@ -52,7 +53,7 @@ async def attendance_recognition(file: UploadFile = File(...)):
                 "user_id": result["user_id"],
                 "user_name": result.get("user_name", result["user_id"]),
                 "confidence": result["confidence"],
-                "timestamp": "2024-12-04T10:30:00Z",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
                 "message": f"Attendance recorded for user {result.get('user_name', result['user_id'])}"
             }
         else:

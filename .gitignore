@@ -1,15 +1,36 @@
-node_modules
-# Keep environment variables out of version control
+# Dependencies
+node_modules/
+
+# Environment variables
 .env
 
+# Prisma generated
 /generated/prisma
 
 # Python virtual environments
 .venv/
 venv/
-backend/facial-attendance/.venv/
-backend/facial-attendance/venv/
 
 # Python cache
 __pycache__/
+*.pyc
 .pytest_cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test/debug artifacts
+test-imports.js
+test-import.py

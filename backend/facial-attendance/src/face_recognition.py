@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import face_recognition
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict
 
 # Handle imports for both package and direct execution
 try:
@@ -90,15 +90,12 @@ class FacialRecognition:
 
             # Get the first face
             face_location = face_locations[0]
-            top, right, bottom, left = face_location
-
-            # Extract face
-            face_image = rgb_image[top:bottom, left:right]
 
             # Generate augmented versions of the full image
             augmented_images = augmenter.augment_face(enhanced_image)
 
             # Try recognition on original and augmented images
+            face_encoding = None
             for img in [enhanced_image] + augmented_images:
                 rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 face_locs = face_recognition.face_locations(rgb_img)
@@ -109,7 +106,7 @@ class FacialRecognition:
                         face_encoding = face_encodings[0]  # Use first face found
                         break  # Found encoding, exit augmentation loop
 
-            if 'face_encoding' not in locals():
+            if face_encoding is None:
                 return {"recognized": False, "message": "Could not encode face"}
 
             # Use vector database for recognition (if available)
