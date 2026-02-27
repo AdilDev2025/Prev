@@ -208,7 +208,7 @@ const getWorkspaceDashboard = async (req, res) => {
             where: { id: workspaceId },
             include: {
                 owner: { // Workspace owner
-                    select: { id: true, name: true, email: true }
+                    select: { id: true, name: true, email: true, face_registered: true }
                 },
                 WorkspaceMember: {
                     include: {
@@ -238,16 +238,22 @@ const getWorkspaceDashboard = async (req, res) => {
             take: 10 // Last 10 attendance records
         });
 
-        // Get user's face registration status
-        const userDetails = workspaceDetails.WorkspaceMember.find(
-            member => member.userId === userId
-        );
+        // Get user's face registration status - check both owner and member
+        let userFaceRegistered = false;
+        if (isOwner) {
+            userFaceRegistered = workspaceDetails.owner.face_registered;
+        } else {
+            const userDetails = workspaceDetails.WorkspaceMember.find(
+                member => member.userId === userId
+            );
+            userFaceRegistered = userDetails ? userDetails.users.face_registered : false;
+        }
 
-        // Calculate workspace stats
+        // Calculate workspace stats (include owner in counts)
         const totalMembers = workspaceDetails.WorkspaceMember.length + 1; // +1 for owner
         const registeredFaces = workspaceDetails.WorkspaceMember.filter(
             member => member.users.face_registered
-        ).length;
+        ).length + (workspaceDetails.owner.face_registered ? 1 : 0);
 
         res.status(200).json({
             workspace: {
@@ -261,7 +267,7 @@ const getWorkspaceDashboard = async (req, res) => {
                 id: req.user.userId,
                 name: req.user.name,
                 email: req.user.email,
-                face_registered: userDetails ? userDetails.users.face_registered : false
+                face_registered: userFaceRegistered
             },
             stats: {
                 total_members: totalMembers,
@@ -278,13 +284,13 @@ const getWorkspaceDashboard = async (req, res) => {
             components: {
                 attendance: {
                     available: true,
-                    registered: userDetails ? userDetails.users.face_registered : false,
+                    registered: userFaceRegistered,
                     recent_count: recentAttendance.length
                 }
                 // Core focus: facial attendance only
             },
             actions_available: [
-                userDetails && !userDetails.users.face_registered ? "register_face" : null,
+                !userFaceRegistered ? "register_face" : null,
                 "mark_attendance"
             ].filter(Boolean)
         });

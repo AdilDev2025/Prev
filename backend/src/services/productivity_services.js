@@ -17,7 +17,7 @@ async function generateMonthlySnapshot(userId, workspaceId, startDate, endDate) 
         }
     });
 
-    if (!attendanceRecords.length) return;
+    if (!attendanceRecords.length) return null;
 
     // ---- AGGREGATION ----
     const totalHours = attendanceRecords.reduce(

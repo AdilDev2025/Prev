@@ -132,20 +132,33 @@ async function generateWorkspaceSnapshots(req, res) {
       });
     }
 
+    // Get the workspace to include the owner
+    const workspace = await prisma.workspace.findUnique({
+      where: { id: parseInt(workspaceId) },
+      select: { ownerId: true }
+    });
+
+    if (!workspace) {
+      return res.status(404).json({ error: "Workspace not found" });
+    }
+
     // Get all members of the workspace
     const members = await prisma.workspaceMember.findMany({
       where: { workspaceId: parseInt(workspaceId) },
       select: { userId: true }
     });
 
+    // Combine owner + members (avoid duplicates)
+    const allUserIds = new Set([workspace.ownerId, ...members.map(m => m.userId)]);
+
     const results = [];
     const errors = [];
 
-    // Generate snapshot for each member
-    for (const member of members) {
+    // Generate snapshot for each user (owner + members)
+    for (const memberId of allUserIds) {
       try {
         const snapshot = await generateMonthlySnapshot(
-          member.userId,
+          memberId,
           parseInt(workspaceId),
           new Date(startDate),
           new Date(endDate)
@@ -153,19 +166,19 @@ async function generateWorkspaceSnapshots(req, res) {
 
         if (snapshot) {
           results.push({
-            userId: member.userId,
+            userId: memberId,
             status: "success",
             snapshot
           });
         } else {
           results.push({
-            userId: member.userId,
+            userId: memberId,
             status: "no_data"
           });
         }
       } catch (error) {
         errors.push({
-          userId: member.userId,
+          userId: memberId,
           error: error.message
         });
       }

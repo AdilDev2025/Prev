@@ -214,20 +214,24 @@ const attendance_WM = async (req, res) => {
                 });
             }
 
-            // Verify the recognized user is still a workspace member
-            const recognizedMember = await prisma.workspaceMember.findUnique({
-                where: {
-                    workspaceId_userId: {
-                        workspaceId: recognizedWorkspaceId,
-                        userId: recognizedUserId
-                    }
-                }
-            });
+            // Verify the recognized user is the workspace owner OR still a member
+            const isRecognizedOwner = workspaceRecord.ownerId === recognizedUserId;
 
-            if (!recognizedMember) {
-                return res.status(403).json({
-                    message: "Recognized user is no longer a workspace member"
+            if (!isRecognizedOwner) {
+                const recognizedMember = await prisma.workspaceMember.findUnique({
+                    where: {
+                        workspaceId_userId: {
+                            workspaceId: recognizedWorkspaceId,
+                            userId: recognizedUserId
+                        }
+                    }
                 });
+
+                if (!recognizedMember) {
+                    return res.status(403).json({
+                        message: "Recognized user is no longer a workspace member"
+                    });
+                }
             }
 
             // Log attendance in database
