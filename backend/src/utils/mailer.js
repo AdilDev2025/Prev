@@ -7,7 +7,7 @@ function getTransporter() {
   if (transporter) return transporter;
 
   const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const pass = (process.env.SMTP_PASS || '').replace(/\s/g, ''); // Strip spaces from app passwords
 
   if (!user || !pass) {
     console.warn('⚠️  SMTP_USER / SMTP_PASS not set — emails will be logged to console only');

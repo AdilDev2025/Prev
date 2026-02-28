@@ -83,8 +83,10 @@ const send_workspace_invite = async (req, res) => {
         return res.status(200).json({
             message: emailResult.sent
                 ? "Invite sent successfully — email delivered"
-                : "Invite created — email could not be sent (check SMTP config)",
+                : "Invite created — but email could not be sent",
             emailSent: emailResult.sent,
+            emailError: emailResult.sent ? undefined : emailResult.reason,
+            emailHint: emailResult.hint || undefined,
             invite: {
                 ...invite,
                 role: role

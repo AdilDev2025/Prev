@@ -1,9 +1,10 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
+
 const express = require('express');
 const cors = require('cors');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const { spawn } = require('child_process');
-const path = require('path');
 const app = express();
 
 // Port configuration
@@ -88,6 +89,33 @@ app.get('/health', (req, res) => {
             facialApi: FACIAL_API_URL
         }
     });
+});
+
+// SMTP / Email health check
+app.get('/health/smtp', async (req, res) => {
+    const nodemailer = require('nodemailer');
+    const user = process.env.SMTP_USER;
+    const pass = process.env.SMTP_PASS;
+
+    if (!user || !pass) {
+        return res.json({ status: 'not_configured', message: 'SMTP_USER or SMTP_PASS missing in .env' });
+    }
+    if (pass.length < 10 || pass.startsWith('REPLACE') || pass === 'abcdefghijklmno') {
+        return res.json({ status: 'placeholder', message: 'SMTP_PASS is still a placeholder — generate a real Google App Password' });
+    }
+
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: { user, pass },
+        connectionTimeout: 10000,
+    });
+
+    try {
+        await transporter.verify();
+        res.json({ status: 'ok', message: `SMTP verified — ready to send emails as ${user}` });
+    } catch (err) {
+        res.json({ status: 'error', message: err.message, hint: 'Check SMTP_PASS — use a Google App Password, not your regular password' });
+    }
 });
 
 // Facial API service status check (before proxy)
