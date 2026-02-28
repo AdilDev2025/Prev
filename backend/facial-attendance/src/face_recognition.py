@@ -7,40 +7,29 @@ from typing import List, Dict
 try:
     from .data_augmentation import augmenter
 except ImportError:
-    # Fallback for direct execution
     import sys
     import os
     sys.path.insert(0, os.path.dirname(__file__))
     from data_augmentation import augmenter
 
-# Optional vector_db import - only import if qdrant_client is available
-try:
-    import qdrant_client
-    VECTOR_DB_AVAILABLE = True
-    # Import vector_db after checking qdrant_client availability
+# Lazy vector_db access – avoid hard crash if Qdrant is down at import time
+def _get_vector_db():
+    """Return the vector_db singleton (or None)."""
     try:
-        from .vector_db import vector_db
-        # Double-check that vector_db is actually initialized
-        if vector_db is None:
-            VECTOR_DB_AVAILABLE = False
-            print("⚠️  Vector database not initialized")
-        else:
-            print("✅ Vector database available for recognition")
-    except ImportError as e:
-        VECTOR_DB_AVAILABLE = False
-        vector_db = None
-        print(f"⚠️  Vector database import failed: {e}")
-except ImportError as e:
-    VECTOR_DB_AVAILABLE = False
-    vector_db = None
-    print(f"⚠️  qdrant-client not available - running in limited mode: {e}")
+        try:
+            from .vector_db import _get_vector_db as _getter
+        except ImportError:
+            from vector_db import _get_vector_db as _getter
+        return _getter()
+    except Exception:
+        return None
+
 
 class FacialRecognition:
     def __init__(self):
         self.known_faces = []
         self.known_names = []
         self.tolerance = 0.6
-        self.use_vector_db = VECTOR_DB_AVAILABLE  # Only use if available
 
     def extract_face_embedding(self, image: np.ndarray) -> np.ndarray:
         """Extract face embedding from image for enrollment"""
@@ -110,9 +99,10 @@ class FacialRecognition:
                 return {"recognized": False, "message": "Could not encode face"}
 
             # Use vector database for recognition (if available)
-            if self.use_vector_db and VECTOR_DB_AVAILABLE and vector_db is not None:
+            vdb = _get_vector_db()
+            if vdb is not None:
                 try:
-                    matches = vector_db.find_similar_faces(face_encoding)
+                    matches = vdb.find_similar_faces(face_encoding)
                     if matches:
                         best_match = matches[0]
                         return {
@@ -123,35 +113,36 @@ class FacialRecognition:
                             "face_location": face_location,
                             "method": "vector_db"
                         }
+                    else:
+                        return {"recognized": False, "message": "Face not recognized (no match in database)"}
                 except Exception as e:
                     print(f"Vector DB error: {e}. Falling back to local recognition.")
-                    self.use_vector_db = False
-            else:
-                # Fallback to local recognition
-                if self.known_faces:
-                    matches = face_recognition.compare_faces(
+
+            # Fallback to local recognition
+            if self.known_faces:
+                matches = face_recognition.compare_faces(
+                    self.known_faces,
+                    face_encoding,
+                    tolerance=self.tolerance
+                )
+
+                if True in matches:
+                    face_distances = face_recognition.face_distance(
                         self.known_faces,
-                        face_encoding,
-                        tolerance=self.tolerance
+                        face_encoding
                     )
 
-                    if True in matches:
-                        face_distances = face_recognition.face_distance(
-                            self.known_faces,
-                            face_encoding
-                        )
+                    best_match_index = np.argmin(face_distances)
+                    confidence = 1 - face_distances[best_match_index]
 
-                        best_match_index = np.argmin(face_distances)
-                        confidence = 1 - face_distances[best_match_index]
-
-                        if confidence > 0.7:
-                            return {
-                                "recognized": True,
-                                "user_id": self.known_names[best_match_index],
-                                "confidence": float(confidence),
-                                "face_location": face_location,
-                                "method": "local"
-                            }
+                    if confidence > 0.7:
+                        return {
+                            "recognized": True,
+                            "user_id": self.known_names[best_match_index],
+                            "confidence": float(confidence),
+                            "face_location": face_location,
+                            "method": "local"
+                        }
 
             return {"recognized": False, "message": "Face not recognized"}
 

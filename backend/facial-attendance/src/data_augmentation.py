@@ -1,25 +1,49 @@
 import cv2
 import numpy as np
-import albumentations as A
 from typing import List
+
+# Try to import albumentations; fall back to no-op augmentation if unavailable
+try:
+    import albumentations as A
+    _HAS_ALBUMENTATIONS = True
+except ImportError:
+    _HAS_ALBUMENTATIONS = False
 
 class RealTimeAugmentation:
     def __init__(self):
-        self.augmentation_pipeline = A.Compose([
-            A.Rotate(limit=15, p=0.3),
-            A.GaussianBlur(blur_limit=3, p=0.2),
-            A.GaussNoise(p=0.2),
-            A.RandomBrightnessContrast(p=0.3),
-            A.RandomShadow(p=0.2),
-        ])
+        if _HAS_ALBUMENTATIONS:
+            # Build pipeline safely – skip transforms that may not exist in the
+            # installed version of albumentations.
+            transforms = [
+                A.Rotate(limit=15, p=0.3),
+                A.GaussianBlur(blur_limit=3, p=0.2),
+                A.RandomBrightnessContrast(p=0.3),
+            ]
+            # GaussNoise / RandomShadow may have different API across versions
+            try:
+                transforms.append(A.GaussNoise(p=0.2))
+            except Exception:
+                pass
+            try:
+                transforms.append(A.RandomShadow(p=0.2))
+            except Exception:
+                pass
+            self.augmentation_pipeline = A.Compose(transforms)
+        else:
+            self.augmentation_pipeline = None
 
     def augment_face(self, full_image: np.ndarray) -> List[np.ndarray]:
         """Generate augmented versions of full image for better face recognition"""
-        augmented_images = []
+        if self.augmentation_pipeline is None:
+            return []  # No augmentation available
 
-        for _ in range(3):
-            augmented = self.augmentation_pipeline(image=full_image)
-            augmented_images.append(augmented['image'])
+        augmented_images = []
+        try:
+            for _ in range(3):
+                augmented = self.augmentation_pipeline(image=full_image)
+                augmented_images.append(augmented['image'])
+        except Exception as e:
+            print(f"⚠️  Augmentation failed (non-fatal): {e}")
 
         return augmented_images
 

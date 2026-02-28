@@ -15,10 +15,9 @@ sys.path.append(str(Path(__file__).parent))
 
 try:
     from src.face_recognition import FacialRecognition
-    from src.vector_db import FaceVectorDB
-    print("✅ Facial recognition modules imported successfully")
+    from src.vector_db import FaceVectorDB, _get_vector_db
 except ImportError as e:
-    print(f"❌ Failed to import facial recognition modules: {e}")
+    print(f"❌ Failed to import facial recognition modules: {e}", file=sys.stderr)
     sys.exit(1)
 
 def main():
@@ -99,18 +98,23 @@ def enroll_face(user_id, user_name, image_path):
             }
 
         try:
-            vector_db = FaceVectorDB()
+            vector_db = _get_vector_db()
+            if vector_db is None:
+                return {
+                    "status": "error",
+                    "message": "Vector database not available. Ensure Qdrant is running on port 6333."
+                }
             success = vector_db.enroll_user_faces(user_id, [image], user_name)
 
             if success:
-                qdrant_id = hashlib.md5(f"{user_id}_face".encode()).hexdigest()
+                qdrant_id = vector_db._generate_id(user_id)
                 return {
                     "status": "success",
                     "message": f"Face enrolled successfully for {user_name}",
                     "user_id": user_id,
                     "user_name": user_name,
                     "qdrant_id": qdrant_id,
-                    "embedding_shape": embedding.shape
+                    "embedding_dim": int(embedding.shape[0]) if hasattr(embedding, 'shape') else len(embedding)
                 }
             else:
                 return {

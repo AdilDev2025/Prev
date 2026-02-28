@@ -1,43 +1,53 @@
-from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct
+from typing import List, Dict
 import numpy as np
 import hashlib
 import uuid
 from datetime import datetime, timezone
-from typing import List, Dict
+
+# Attempt to import qdrant_client; allow module to load even if qdrant is absent
+try:
+    from qdrant_client import QdrantClient
+    from qdrant_client.models import Distance, VectorParams, PointStruct
+    _HAS_QDRANT = True
+except ImportError:
+    _HAS_QDRANT = False
 
 class FaceVectorDB:
     def __init__(self, url: str = "http://localhost:6333"):
-        self.client = QdrantClient(url=url)
+        if not _HAS_QDRANT:
+            raise RuntimeError("qdrant-client is not installed")
+        self.url = url
+        self.client = QdrantClient(url=url, timeout=5)
         self.collection_name = "faces"
+        self._collection_ready = False
         self._ensure_collection()
 
     def _ensure_collection(self):
         """Create collection if it doesn't exist"""
+        if self._collection_ready:
+            return
         try:
-            self.client.get_collection(self.collection_name)
+            collections = self.client.get_collections().collections
+            names = [c.name for c in collections]
+            if self.collection_name not in names:
+                self.client.create_collection(
+                    collection_name=self.collection_name,
+                    vectors_config=VectorParams(size=128, distance=Distance.COSINE)
+                )
+                print(f"✅ Created '{self.collection_name}' collection")
+            self._collection_ready = True
         except Exception as e:
             msg = str(e).lower()
-
-            # If collection is missing, create it. Otherwise, bubble up the error
-            # (e.g. connection refused, auth issues, invalid URL).
-            if "not found" in msg or "doesn't exist" in msg or "404" in msg:
-                try:
-                    self.client.create_collection(
-                        collection_name=self.collection_name,
-                        vectors_config=VectorParams(size=128, distance=Distance.COSINE)
-                    )
-                except Exception as create_err:
-                    create_msg = str(create_err).lower()
-                    # If it was created concurrently, that's fine.
-                    if "already exists" in create_msg or "409" in create_msg or "conflict" in create_msg:
-                        return
-                    raise
-            else:
-                raise
+            # If collection already exists that's fine
+            if "already exists" in msg or "409" in msg or "conflict" in msg:
+                self._collection_ready = True
+                return
+            print(f"⚠️  Could not ensure collection: {e}")
+            raise
 
     def store_face_embedding(self, user_id: str, embedding: np.ndarray, user_name: str = None, metadata: Dict = None):
         """Store face embedding in vector database"""
+        self._ensure_collection()
         payload = {
             "user_id": user_id,
             "user_name": user_name or user_id,
@@ -48,7 +58,7 @@ class FaceVectorDB:
 
         point = PointStruct(
             id=self._generate_id(user_id),
-            vector=embedding.tolist(),
+            vector=embedding.tolist() if hasattr(embedding, 'tolist') else list(embedding),
             payload=payload
         )
 
@@ -59,23 +69,29 @@ class FaceVectorDB:
 
     def find_similar_faces(self, embedding: np.ndarray, limit: int = 5) -> List[Dict]:
         """Find similar faces using vector similarity"""
+        self._ensure_collection()
+        query_vec = embedding.tolist() if hasattr(embedding, 'tolist') else list(embedding)
+
         # qdrant-client API differs by version.
         # Newer clients use `query_points`; older clients used `search`.
-        if hasattr(self.client, "query_points"):
-            resp = self.client.query_points(
-                collection_name=self.collection_name,
-                query=embedding.tolist(),
-                limit=limit,
-                with_payload=True,
-            )
-            results = resp.points
-        else:
-            # Fallback for older qdrant-client versions
-            results = self.client.search(
-                collection_name=self.collection_name,
-                query_vector=embedding.tolist(),
-                limit=limit
-            )
+        try:
+            if hasattr(self.client, "query_points"):
+                resp = self.client.query_points(
+                    collection_name=self.collection_name,
+                    query=query_vec,
+                    limit=limit,
+                    with_payload=True,
+                )
+                results = resp.points
+            else:
+                results = self.client.search(
+                    collection_name=self.collection_name,
+                    query_vector=query_vec,
+                    limit=limit
+                )
+        except Exception as e:
+            print(f"⚠️  Qdrant search failed: {e}")
+            return []
 
         matches = []
         for result in results:
@@ -97,7 +113,10 @@ class FaceVectorDB:
 
     def enroll_user_faces(self, user_id: str, face_images: List[np.ndarray], user_name: str = None):
         """Enroll user with multiple face images"""
-        from .face_recognition import recognition_engine
+        try:
+            from .face_recognition import recognition_engine
+        except ImportError:
+            from face_recognition import recognition_engine
 
         embeddings = []
         for image in face_images:
@@ -138,11 +157,25 @@ class FaceVectorDB:
             print(f"Error loading known faces: {e}")
             return {}
 
-# Global instance - only create if qdrant is available
-try:
-    vector_db = FaceVectorDB()
-    print("✅ Vector database connected successfully")
-except Exception as e:
-    print(f"⚠️  Vector database not available: {e}")
-    print("   Install qdrant-client and start Qdrant server for full functionality")
-    vector_db = None
+# ---------------------------------------------------------------------------
+# Module-level singleton – lazy so Qdrant doesn't have to be up at import time
+# ---------------------------------------------------------------------------
+_vector_db_instance: "FaceVectorDB | None" = None
+_vector_db_error: str = ""
+
+def _get_vector_db() -> "FaceVectorDB | None":
+    global _vector_db_instance, _vector_db_error
+    if _vector_db_instance is not None:
+        return _vector_db_instance
+    try:
+        _vector_db_instance = FaceVectorDB()
+        _vector_db_error = ""
+        print("✅ Vector database connected successfully")
+        return _vector_db_instance
+    except Exception as e:
+        _vector_db_error = str(e)
+        print(f"⚠️  Vector database not available: {e}")
+        return None
+
+# Eagerly try once at import time (non-fatal)
+vector_db = _get_vector_db()

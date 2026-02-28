@@ -1,4 +1,5 @@
 const prisma = require('../../lib/prisma');
+const { sendInviteEmail } = require('../../utils/mailer');
 
 const send_workspace_invite = async (req, res) => {
     try {
@@ -70,8 +71,20 @@ const send_workspace_invite = async (req, res) => {
             }
         });
 
+        // Send invitation email
+        const emailResult = await sendInviteEmail({
+            to: email,
+            inviterName: req.user.name,
+            workspaceName: workspace.name,
+            inviteId: invite.id,
+            role: role,
+        });
+
         return res.status(200).json({
-            message: "Invite sent successfully",
+            message: emailResult.sent
+                ? "Invite sent successfully — email delivered"
+                : "Invite created — email could not be sent (check SMTP config)",
+            emailSent: emailResult.sent,
             invite: {
                 ...invite,
                 role: role

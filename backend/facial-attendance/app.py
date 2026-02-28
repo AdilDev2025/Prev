@@ -1,21 +1,22 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 import cv2
 import numpy as np
 from src.face_recognition import recognition_engine
 
-# Import vector_db for direct access
-try:
-    from src.vector_db import vector_db
-except ImportError:
-    vector_db = None
+# Lazy vector_db access – doesn't crash if Qdrant is down at startup
+from src.vector_db import _get_vector_db
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize recognition engine on startup"""
-    # TODO: Load known faces from database
-    print("Facial recognition engine initialized")
+    vdb = _get_vector_db()
+    if vdb:
+        print("✅ Facial recognition engine initialized with Qdrant")
+    else:
+        print("⚠️  Facial recognition engine started WITHOUT Qdrant – enroll/recognize will fail until Qdrant is up")
     yield
 
 app = FastAPI(
@@ -25,13 +26,27 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Allow the Node.js backend and frontend to call this API directly
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 async def root():
     return {"message": "Facial Recognition Attendance API", "status": "running"}
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "facial-recognition"}
+    vdb = _get_vector_db()
+    return {
+        "status": "healthy",
+        "service": "facial-recognition",
+        "qdrant_connected": vdb is not None,
+    }
 
 @app.post("/attendance-recognition")
 async def attendance_recognition(file: UploadFile = File(...)):
@@ -77,17 +92,16 @@ async def enroll_face(user_id: str, user_name: str = None, file: UploadFile = Fi
         if image is None:
             raise HTTPException(status_code=400, detail="Invalid image")
 
-        # Check if vector database is available
-        if vector_db is None:
-            raise HTTPException(status_code=503, detail="Vector database not available. Please ensure Qdrant is running.")
+        # Check if vector database is available (lazy connect)
+        vdb = _get_vector_db()
+        if vdb is None:
+            raise HTTPException(status_code=503, detail="Vector database not available. Please ensure Qdrant is running on port 6333.")
 
         # Enroll face in vector database
-        success = vector_db.enroll_user_faces(user_id, [image], user_name=user_name)
+        success = vdb.enroll_user_faces(user_id, [image], user_name=user_name)
 
         if success:
-            # Expose the deterministic Qdrant point ID so other services
-            # (e.g. Node/Prisma) can store and later reference/delete it.
-            qdrant_id = vector_db._generate_id(user_id)
+            qdrant_id = vdb._generate_id(user_id)
             return {
                 "status": "success",
                 "message": f"Face enrolled for user {user_name or user_id}",
@@ -107,14 +121,15 @@ async def enroll_face(user_id: str, user_name: str = None, file: UploadFile = Fi
 async def get_enrolled_users():
     """Get list of enrolled users"""
     try:
-        if vector_db is None:
+        vdb = _get_vector_db()
+        if vdb is None:
             raise HTTPException(
                 status_code=503,
                 detail="Vector database not available. Please ensure Qdrant is running."
             )
         # Get all points from Qdrant to access payload data
-        response = vector_db.client.scroll(
-            collection_name=vector_db.collection_name,
+        response = vdb.client.scroll(
+            collection_name=vdb.collection_name,
             limit=1000
         )
 

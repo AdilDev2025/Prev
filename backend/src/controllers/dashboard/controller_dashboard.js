@@ -231,11 +231,30 @@ const getWorkspaceDashboard = async (req, res) => {
             },
             include: {
                 user: {
-                    select: { name: true }
+                    select: { name: true, email: true }
                 }
             },
             orderBy: { check_in: 'desc' },
-            take: 10 // Last 10 attendance records
+            take: 20 // Last 20 attendance records
+        });
+
+        // Get today's attendance records
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayEnd = new Date();
+        todayEnd.setHours(23, 59, 59, 999);
+
+        const todayAttendance = await prisma.attendance.findMany({
+            where: {
+                workspaceId: workspaceId,
+                check_in: { gte: todayStart, lte: todayEnd }
+            },
+            include: {
+                user: {
+                    select: { name: true, email: true }
+                }
+            },
+            orderBy: { check_in: 'desc' }
         });
 
         // Get user's face registration status - check both owner and member
@@ -249,11 +268,47 @@ const getWorkspaceDashboard = async (req, res) => {
             userFaceRegistered = userDetails ? userDetails.users.face_registered : false;
         }
 
-        // Calculate workspace stats (include owner in counts)
-        const totalMembers = workspaceDetails.WorkspaceMember.length + 1; // +1 for owner
-        const registeredFaces = workspaceDetails.WorkspaceMember.filter(
+        // Calculate workspace stats
+        // Admin/owner is excluded from attendance counts — they don't mark attendance
+        const totalMembers = workspaceDetails.WorkspaceMember.length + 1; // total people including owner
+        const employeeMembers = workspaceDetails.WorkspaceMember.filter(m => m.role !== 'admin');
+        const registeredFaces = employeeMembers.filter(
             member => member.users.face_registered
-        ).length + (workspaceDetails.owner.face_registered ? 1 : 0);
+        ).length;
+
+        // Build members list (owner + members) for admin overview
+        const todayPresentUserIds = new Set(todayAttendance.map(r => r.userId));
+
+        const membersList = [
+            // Owner — marked as exempt from attendance
+            {
+                id: workspaceDetails.owner.id,
+                name: workspaceDetails.owner.name,
+                email: workspaceDetails.owner.email,
+                face_registered: workspaceDetails.owner.face_registered,
+                role: 'owner',
+                attendance_exempt: true,
+                present_today: todayPresentUserIds.has(workspaceDetails.owner.id)
+            },
+            // Members
+            ...workspaceDetails.WorkspaceMember.map(m => ({
+                id: m.users.id,
+                name: m.users.name,
+                email: m.users.email,
+                face_registered: m.users.face_registered,
+                role: m.role,
+                attendance_exempt: m.role === 'admin',
+                present_today: todayPresentUserIds.has(m.users.id)
+            }))
+        ];
+
+        // Admin should not see register_face / mark_attendance actions
+        const actionsAvailable = userRole === 'admin'
+            ? []
+            : [
+                !userFaceRegistered ? "register_face" : null,
+                "mark_attendance"
+              ].filter(Boolean);
 
         res.status(200).json({
             workspace: {
@@ -269,15 +324,35 @@ const getWorkspaceDashboard = async (req, res) => {
                 email: req.user.email,
                 face_registered: userFaceRegistered
             },
+            members: membersList,
             stats: {
                 total_members: totalMembers,
                 registered_faces: registeredFaces,
-                recent_attendance_count: recentAttendance.length
+                employee_count: employeeMembers.length,
+                recent_attendance_count: recentAttendance.length,
+                today_attendance_count: todayAttendance.length
             },
             recent_attendance: recentAttendance.map(record => ({
                 id: record.id,
+                user_id: record.userId,
                 user_name: record.user.name,
+                user_email: record.user.email,
                 check_in: record.check_in,
+                check_out: record.check_out,
+                session_duration: record.sessionDuration,
+                is_after_hours: record.isAfterHours,
+                confidence: record.confidence,
+                status: record.status
+            })),
+            today_attendance: todayAttendance.map(record => ({
+                id: record.id,
+                user_id: record.userId,
+                user_name: record.user.name,
+                user_email: record.user.email,
+                check_in: record.check_in,
+                check_out: record.check_out,
+                session_duration: record.sessionDuration,
+                is_after_hours: record.isAfterHours,
                 confidence: record.confidence,
                 status: record.status
             })),
@@ -287,12 +362,8 @@ const getWorkspaceDashboard = async (req, res) => {
                     registered: userFaceRegistered,
                     recent_count: recentAttendance.length
                 }
-                // Core focus: facial attendance only
             },
-            actions_available: [
-                !userFaceRegistered ? "register_face" : null,
-                "mark_attendance"
-            ].filter(Boolean)
+            actions_available: actionsAvailable
         });
 
     } catch (error) {
