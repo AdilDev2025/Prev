@@ -4,11 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Initialize React project with Vite setup, add essential files and configurations including ESLint, .gitignore, and basic components for authentication and workspace management.">
+    <list default="true" id="20d7cb4e-d9ff-4c25-bfc5-0c3566952f30" name="Changes" comment="Improved SMTP handling with health check endpoint, placeholder validation, and enhanced invite email error reporting.">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/controllers/workspace/workspace_invite_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/controllers/workspace/workspace_invite_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/controllers/dashboard/attendance_WM_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/controllers/dashboard/attendance_WM_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/controllers/dashboard/controller_dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/controllers/dashboard/controller_dashboard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/controllers/dashboard/productivity_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/controllers/dashboard/productivity_controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/services/productivity_services.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/services/productivity_services.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/utils/mailer.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/utils/mailer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/attendance/MarkAttendance.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/attendance/MarkAttendance.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/productivity/ProductivityReport.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/productivity/ProductivityReport.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/WorkspaceDashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/WorkspaceDashboard.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -275,7 +281,18 @@
       <workItem from="1772211178532" duration="9731000" />
       <workItem from="1772230160601" duration="7671000" />
       <workItem from="1772242424378" duration="10000" />
-      <workItem from="1772288676670" duration="2985000" />
+      <workItem from="1772288676670" duration="4948000" />
+      <workItem from="1772302299209" duration="2592000" />
+      <workItem from="1772305819108" duration="22000" />
+      <workItem from="1772305857247" duration="192000" />
+      <workItem from="1772308126588" duration="70000" />
+      <workItem from="1772362815636" duration="58000" />
+      <workItem from="1772363094184" duration="35000" />
+      <workItem from="1772363162804" duration="118000" />
+      <workItem from="1772363284267" duration="1000" />
+      <workItem from="1772363287266" duration="1000" />
+      <workItem from="1772400807029" duration="942000" />
+      <workItem from="1772533502759" duration="3617000" />
     </task>
     <task id="LOCAL-00001" summary="jwt token-based authentication enabled for users">
       <option name="closed" value="true" />
@@ -405,7 +422,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772242359740</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Improved SMTP handling with health check endpoint, placeholder validation, and enhanced invite email error reporting.">
+      <option name="closed" value="true" />
+      <created>1772293458057</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1772293458057</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -444,7 +469,8 @@
     <MESSAGE value="Enhanced productivity and attendance APIs: updated middleware for role-based access, refined workspace logic to include owners, improved error handling, and adjusted endpoints for better data aggregation." />
     <MESSAGE value="Added nodemailer for email invitations, enhanced workspace invite functionality with email notifications, and expanded productivity API with new endpoints for live hours and workspace snapshots." />
     <MESSAGE value="Initialize React project with Vite setup, add essential files and configurations including ESLint, .gitignore, and basic components for authentication and workspace management." />
-    <option name="LAST_COMMIT_MESSAGE" value="Initialize React project with Vite setup, add essential files and configurations including ESLint, .gitignore, and basic components for authentication and workspace management." />
+    <MESSAGE value="Improved SMTP handling with health check endpoint, placeholder validation, and enhanced invite email error reporting." />
+    <option name="LAST_COMMIT_MESSAGE" value="Improved SMTP handling with health check endpoint, placeholder validation, and enhanced invite email error reporting." />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

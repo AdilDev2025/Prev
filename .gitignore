@@ -34,3 +34,4 @@ npm-debug.log*
 # Test/debug artifacts
 test-imports.js
 test-import.py
+backend/facial-attendance/data/training_data

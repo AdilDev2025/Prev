@@ -214,46 +214,36 @@ function OverviewTab({ data, isAdmin }) {
           </tbody>
         </table>
 
-        {/* Recent activity feed */}
-        <h3>📋 Recent Activity</h3>
-        {recentAttendance.length === 0 ? (
-          <p className="text-muted">No attendance records yet.</p>
-        ) : (
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Member</th>
-                <th>Date & Time</th>
-                <th>Confidence</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentAttendance.slice(0, 10).map(r => (
-                <tr key={r.id}>
-                  <td>
-                    <strong>{r.user_name}</strong>
-                    {r.user_email && (
-                      <span className="text-muted" style={{ display: 'block', fontSize: 12 }}>{r.user_email}</span>
+        {/* Activity Feed */}
+        <h3>📋 Activity Feed</h3>
+        {(() => {
+          const feed = data.activity_feed || [];
+          return feed.length === 0 ? (
+            <p className="text-muted">No activity yet.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {feed.slice(0, 15).map((item, i) => (
+                <div key={i} style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 0',
+                  borderBottom: i < feed.length - 1 ? '1px solid #f1f5f9' : 'none'
+                }}>
+                  <span style={{ fontSize: 18, lineHeight: '24px', flexShrink: 0 }}>{item.icon}</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 500 }}>{item.message}</div>
+                    {item.detail && (
+                      <div className="text-muted" style={{ fontSize: 12, marginTop: 2 }}>{item.detail}</div>
                     )}
-                  </td>
-                  <td>{new Date(r.check_in).toLocaleString()}</td>
-                  <td>
-                    {r.confidence ? (
-                      <span style={{
-                        color: r.confidence > 0.8 ? '#22c55e' : r.confidence > 0.6 ? '#eab308' : '#ef4444',
-                        fontWeight: 600
-                      }}>
-                        {(r.confidence * 100).toFixed(1)}%
-                      </span>
-                    ) : '—'}
-                  </td>
-                  <td><span className="badge badge-green">{r.status}</span></td>
-                </tr>
+                  </div>
+                  <span className="text-muted" style={{ fontSize: 12, flexShrink: 0, whiteSpace: 'nowrap' }}>
+                    {new Date(item.timestamp).toLocaleString([], {
+                      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    })}
+                  </span>
+                </div>
               ))}
-            </tbody>
-          </table>
-        )}
+            </div>
+          );
+        })()}
       </div>
     );
   }
@@ -261,9 +251,9 @@ function OverviewTab({ data, isAdmin }) {
   /* ─── USER/EMPLOYEE OVERVIEW ─── */
   return (
     <div>
-      <h3>Today's Attendance Summary</h3>
+      <h3>Your Attendance Today</h3>
       {todayAttendance.length === 0 ? (
-        <p className="text-muted">No one has checked in today.</p>
+        <p className="text-muted">You have not checked in today.</p>
       ) : (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
           {todayAttendance.map(r => (
@@ -282,14 +272,13 @@ function OverviewTab({ data, isAdmin }) {
         </div>
       )}
 
-      <h3>Recent Activity</h3>
+      <h3>Your Recent Activity</h3>
       {recentAttendance.length === 0 ? (
         <p className="text-muted">No attendance records yet.</p>
       ) : (
         <table className="table">
           <thead>
             <tr>
-              <th>Name</th>
               <th>Check In</th>
               <th>Status</th>
             </tr>
@@ -297,7 +286,6 @@ function OverviewTab({ data, isAdmin }) {
           <tbody>
             {recentAttendance.slice(0, 5).map(r => (
               <tr key={r.id}>
-                <td>{r.user_name}</td>
                 <td>{new Date(r.check_in).toLocaleString()}</td>
                 <td><span className="badge badge-green">{r.status}</span></td>
               </tr>

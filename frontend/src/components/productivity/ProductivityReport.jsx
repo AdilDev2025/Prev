@@ -5,6 +5,7 @@ export default function ProductivityReport({ workspaceId, userId, isAdmin }) {
   const [snapshots, setSnapshots] = useState([]);
   const [allSnapshots, setAllSnapshots] = useState([]);  // admin: all members
   const [latest, setLatest] = useState(null);
+  const [todaySnapshot, setTodaySnapshot] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -55,9 +56,10 @@ export default function ProductivityReport({ workspaceId, userId, isAdmin }) {
         setError(results[0].reason?.message || 'Failed to load snapshots');
       }
 
-      // Latest own
+      // Latest own + today's daily snapshot
       if (results[1].status === 'fulfilled') {
         setLatest(results[1].value.data || null);
+        setTodaySnapshot(results[1].value.today_snapshot || null);
       }
 
       // Live hours (own)
@@ -151,7 +153,14 @@ export default function ProductivityReport({ workspaceId, userId, isAdmin }) {
       {/* Latest Score */}
       <h3>Your Productivity Score</h3>
       {latest ? (
-        <div className="stats-grid" style={{ marginBottom: 24 }}>
+        <div>
+          <p className="text-muted" style={{ marginBottom: 8, fontSize: 13 }}>
+            📅 Period: {new Date(latest.periodStart).toLocaleDateString()} – {new Date(latest.periodEnd).toLocaleDateString()}
+            <span style={{ marginLeft: 12 }}>
+              Generated: {new Date(latest.generatedAt).toLocaleString()}
+            </span>
+          </p>
+          <div className="stats-grid" style={{ marginBottom: 24 }}>
           <div className="stat-card" style={{ borderLeft: `4px solid ${scoreColor(latest.finalScore)}` }}>
             <div className="stat-value" style={{ color: scoreColor(latest.finalScore) }}>
               {fmt(latest.finalScore)}
@@ -174,13 +183,44 @@ export default function ProductivityReport({ workspaceId, userId, isAdmin }) {
             <div className="stat-value">{fmtPct(latest.reliabilityScore)}</div>
             <div className="stat-label">Reliability Score</div>
           </div>
-          <div className="stat-card">
+           <div className="stat-card">
             <div className="stat-value">{fmt(latest.afterHours)}h</div>
             <div className="stat-label">After Hours</div>
           </div>
+          </div>
         </div>
       ) : (
-        <p className="text-muted">No productivity data yet. Generate a snapshot below.</p>
+        <p className="text-muted">No productivity data yet. Check out from a session to auto-generate your score, or generate one manually below.</p>
+      )}
+
+      {/* ─── Today's Daily Score (auto-generated after checkout) ─── */}
+      {todaySnapshot && (
+        <div className="card" style={{ marginBottom: 16, borderLeft: '4px solid #3b82f6' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>
+            <div>
+              <strong style={{ fontSize: 15 }}>📅 Today's Session Score</strong>
+              <p className="text-muted" style={{ margin: '2px 0 0', fontSize: 12 }}>
+                Auto-generated after checkout · {new Date(todaySnapshot.generatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </p>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{
+                fontSize: 28, fontWeight: 700,
+                color: scoreColor(todaySnapshot.finalScore)
+              }}>
+                {fmt(todaySnapshot.finalScore)}
+              </div>
+              <span className="text-muted" style={{ fontSize: 12 }}>/ 100</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 16, marginTop: 10, flexWrap: 'wrap', fontSize: 13 }}>
+            <span>⏱ {fmt(todaySnapshot.totalHours)}h worked</span>
+            <span>🎯 {fmtPct(todaySnapshot.avgConfidence)} precision</span>
+            {todaySnapshot.afterHours > 0 && (
+              <span style={{ color: '#d97706' }}>🌙 {fmt(todaySnapshot.afterHours)}h overtime</span>
+            )}
+          </div>
+        </div>
       )}
 
       {/* ─── Live Hours (Employee) ─── */}

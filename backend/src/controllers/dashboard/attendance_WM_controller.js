@@ -2,6 +2,7 @@ const axios = require('axios')
 const FormData = require('form-data')
 const prisma = require('../../lib/prisma')
 const crypto = require('crypto')
+const { postCheckoutSnapshot } = require('../../services/productivity_services')
 
 // Facial API configuration - read at call time to ensure dotenv has loaded
 const getFacialApiUrl = () => process.env.FACIAL_API_URL || 'http://localhost:8000';
@@ -49,6 +50,10 @@ async function autoCloseStaleSession(userId, workspaceId) {
                 status: 'PRESENT'
             }
         });
+
+        // Fire-and-forget: auto-generate productivity snapshot for the auto-closed session
+        postCheckoutSnapshot(userId, workspaceId, openSession.check_in);
+
         return null; // session is now closed, caller can create new one
     }
 
@@ -196,6 +201,16 @@ async function recognizeFaceAndVerify(req, res, workspaceId) {
         return null;
     }
 
+    // ─── IDENTITY CHECK: recognized face MUST match the logged-in user ───
+    // Prevents User A from marking attendance using User B's face
+    if (recognizedUser !== userId) {
+        res.status(403).json({
+            message: "Face does not match your account. You can only mark your own attendance.",
+            status: "identity_mismatch"
+        });
+        return null;
+    }
+
     // Verify recognized user is still a member
     if (workspace.ownerId !== recognizedUser) {
         const rmember = await prisma.workspaceMember.findUnique({
@@ -309,7 +324,6 @@ const checkout_WM = async (req, res) => {
         const now = new Date();
         const checkInTime = new Date(openSession.check_in);
         const sessionDuration = (now - checkInTime) / (1000 * 60 * 60); // hours
-        const afterHoursAmount = Math.max(0, sessionDuration - REGULAR_HOURS_THRESHOLD);
 
         // If session >12h, auto-close at 12h mark and tell user
         let checkOutTime = now;
@@ -329,6 +343,9 @@ const checkout_WM = async (req, res) => {
                 isAfterHours: finalAfterHours > 0
             }
         });
+
+        // Fire-and-forget: auto-generate daily + monthly productivity snapshots
+        postCheckoutSnapshot(recognizedUserId, workspaceId, openSession.check_in);
 
         res.status(200).json({
             message: "Checked out successfully",

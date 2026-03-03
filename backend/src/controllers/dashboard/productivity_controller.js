@@ -84,21 +84,56 @@ async function getProductivitySnapshots(req, res) {
 
 /**
  * Get latest productivity snapshot
+ * Returns: monthly snapshot (overall score) + today's daily snapshot (if exists)
  * GET /api/productivity/snapshot/latest/:userId/:workspaceId
  */
 async function getLatestSnapshot(req, res) {
   try {
     const { userId, workspaceId } = req.params;
+    const uid = parseInt(userId);
+    const wid = parseInt(workspaceId);
 
-    const snapshot = await prisma.productivitySnapshot.findFirst({
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    // 1. Current month's monthly snapshot (the overall rolling score)
+    let snapshot = await prisma.productivitySnapshot.findFirst({
       where: {
-        userId: parseInt(userId),
-        workspaceId: parseInt(workspaceId)
+        userId: uid,
+        workspaceId: wid,
+        periodType: "monthly",
+        periodStart: { gte: monthStart },
+        periodEnd: { lte: monthEnd }
       },
       orderBy: { generatedAt: "desc" }
     });
 
+    // Fall back to most recent snapshot of any type
     if (!snapshot) {
+      snapshot = await prisma.productivitySnapshot.findFirst({
+        where: { userId: uid, workspaceId: wid },
+        orderBy: { generatedAt: "desc" }
+      });
+    }
+
+    // 2. Today's daily snapshot
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(todayStart);
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const todaySnapshot = await prisma.productivitySnapshot.findFirst({
+      where: {
+        userId: uid,
+        workspaceId: wid,
+        periodType: "daily",
+        periodStart: { gte: todayStart },
+        periodEnd: { lte: todayEnd }
+      },
+      orderBy: { generatedAt: "desc" }
+    });
+
+    if (!snapshot && !todaySnapshot) {
       return res.status(404).json({
         error: "No productivity snapshot found"
       });
@@ -106,7 +141,8 @@ async function getLatestSnapshot(req, res) {
 
     res.json({
       success: true,
-      data: snapshot
+      data: snapshot || todaySnapshot,
+      today_snapshot: todaySnapshot || null
     });
   } catch (error) {
     console.error("Error fetching latest snapshot:", error);

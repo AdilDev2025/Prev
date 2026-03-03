@@ -225,10 +225,14 @@ const getWorkspaceDashboard = async (req, res) => {
         }
 
         // Get recent attendance records for this workspace
+        // Admins/owners see all records; regular users only see their own
+        const attendanceWhereBase = { workspaceId: workspaceId };
+        if (userRole !== 'admin') {
+            attendanceWhereBase.userId = userId;
+        }
+
         const recentAttendance = await prisma.attendance.findMany({
-            where: {
-                workspaceId: workspaceId
-            },
+            where: attendanceWhereBase,
             include: {
                 user: {
                     select: { name: true, email: true }
@@ -244,11 +248,16 @@ const getWorkspaceDashboard = async (req, res) => {
         const todayEnd = new Date();
         todayEnd.setHours(23, 59, 59, 999);
 
+        const todayAttendanceWhere = {
+            workspaceId: workspaceId,
+            check_in: { gte: todayStart, lte: todayEnd }
+        };
+        if (userRole !== 'admin') {
+            todayAttendanceWhere.userId = userId;
+        }
+
         const todayAttendance = await prisma.attendance.findMany({
-            where: {
-                workspaceId: workspaceId,
-                check_in: { gte: todayStart, lte: todayEnd }
-            },
+            where: todayAttendanceWhere,
             include: {
                 user: {
                     select: { name: true, email: true }
@@ -310,6 +319,85 @@ const getWorkspaceDashboard = async (req, res) => {
                 "mark_attendance"
               ].filter(Boolean);
 
+        // ─── Build Activity Feed ───
+        // Merge attendance events + productivity snapshots into a chronological feed
+        const feedAttendanceWhere = { workspaceId: workspaceId };
+        if (userRole !== 'admin') {
+            feedAttendanceWhere.userId = userId;
+        }
+
+        const feedAttendance = await prisma.attendance.findMany({
+            where: feedAttendanceWhere,
+            include: { user: { select: { name: true } } },
+            orderBy: { check_in: 'desc' },
+            take: 15
+        });
+
+        const feedSnapshotWhere = { workspaceId: workspaceId };
+        if (userRole !== 'admin') {
+            feedSnapshotWhere.userId = userId;
+        }
+
+        const feedSnapshots = await prisma.productivitySnapshot.findMany({
+            where: feedSnapshotWhere,
+            include: { user: { select: { name: true } } },
+            orderBy: { generatedAt: 'desc' },
+            take: 5
+        });
+
+        // Build feed items
+        const activityFeed = [];
+
+        for (const a of feedAttendance) {
+            const name = userRole === 'admin' ? a.user.name : 'You';
+            // Check-in event
+            activityFeed.push({
+                type: 'check_in',
+                icon: '🟢',
+                message: `${name} checked in`,
+                detail: a.confidence ? `Confidence: ${(a.confidence * 100).toFixed(1)}%` : null,
+                timestamp: a.check_in,
+                userId: a.userId
+            });
+            // Check-out event (if completed)
+            if (a.check_out) {
+                const duration = a.sessionDuration ? `${a.sessionDuration.toFixed(1)}h` : '';
+                const afterHrs = a.isAfterHours && a.sessionDuration
+                    ? ` (${Math.max(0, a.sessionDuration - 8).toFixed(1)}h after-hours)`
+                    : '';
+                activityFeed.push({
+                    type: 'check_out',
+                    icon: '🔴',
+                    message: `${name} checked out`,
+                    detail: `Session: ${duration}${afterHrs}`,
+                    timestamp: a.check_out,
+                    userId: a.userId
+                });
+            }
+        }
+
+        for (const s of feedSnapshots) {
+            const name = userRole === 'admin' ? s.user.name : 'Your';
+            activityFeed.push({
+                type: 'productivity_score',
+                icon: '📊',
+                message: `${name} productivity score generated`,
+                detail: `Score: ${s.finalScore.toFixed(1)}/100 · ${s.totalHours.toFixed(1)}h · ${s.periodType}`,
+                timestamp: s.generatedAt,
+                userId: s.userId
+            });
+        }
+
+        // Sort by timestamp descending, take top 20
+        activityFeed.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        const trimmedFeed = activityFeed.slice(0, 20);
+
+        // ─── Latest productivity snapshot for the user ───
+        const latestSnapshot = await prisma.productivitySnapshot.findFirst({
+            where: { userId, workspaceId: workspaceId },
+            orderBy: { generatedAt: 'desc' }
+        });
+
         res.status(200).json({
             workspace: {
                 id: workspaceDetails.id,
@@ -363,7 +451,18 @@ const getWorkspaceDashboard = async (req, res) => {
                     recent_count: recentAttendance.length
                 }
             },
-            actions_available: actionsAvailable
+            actions_available: actionsAvailable,
+            activity_feed: trimmedFeed,
+            latest_productivity: latestSnapshot ? {
+                final_score: latestSnapshot.finalScore,
+                total_hours: latestSnapshot.totalHours,
+                avg_confidence: latestSnapshot.avgConfidence,
+                after_hours: latestSnapshot.afterHours,
+                period_type: latestSnapshot.periodType,
+                period_start: latestSnapshot.periodStart,
+                period_end: latestSnapshot.periodEnd,
+                generated_at: latestSnapshot.generatedAt
+            } : null
         });
 
     } catch (error) {

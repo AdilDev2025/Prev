@@ -80,6 +80,9 @@ export default function MarkAttendance({ workspaceId }) {
         // Already checked in
         await loadStatus();
         setError('You are already checked in. Use Check Out below.');
+      } else if (err.status === 403 && err.message?.includes('does not match')) {
+        setFile(null);
+        setError('🚫 Face does not match your account. You can only mark your own attendance.');
       } else if (err.status === 503 || err.message?.includes('not running')) {
         setError('⚠️ Facial Recognition Service Offline — please wait and try again.');
       } else {
@@ -108,6 +111,9 @@ export default function MarkAttendance({ workspaceId }) {
       if (err.status === 404 && err.message?.includes('No active')) {
         await loadStatus();
         setError('No active session found. You may need to check in first.');
+      } else if (err.status === 403 && err.message?.includes('does not match')) {
+        setFile(null);
+        setError('🚫 Face does not match your account. You can only check out with your own face.');
       } else if (err.status === 503) {
         setError('⚠️ Facial Recognition Service Offline.');
       } else {
